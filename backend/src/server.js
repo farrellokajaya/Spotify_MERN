@@ -1,24 +1,21 @@
 import "dotenv/config";
 
 import app from "./app.js";
+import connectDatabase from "./config/db.js";
 
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
-  console.log(`Soundify API is running on http://localhost:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-});
+const startServer = async () => {
+  try {
+    await connectDatabase();
 
-process.on("unhandledRejection", (error) => {
-  console.error("Unhandled promise rejection:", error);
-
-  server.close(() => {
+    app.listen(PORT, () => {
+      console.log(`Soundify API running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error(`Failed to start server: ${error.message}`);
     process.exit(1);
-  });
-});
+  }
+};
 
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error);
-
-  process.exit(1);
-});
+startServer();
