@@ -1,44 +1,38 @@
-import {
-  Route,
-  Routes,
-} from "react-router";
+import { useEffect, useState } from "react";
+import { getHealthStatus } from "./services/api";
+import "./App.css";
 
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import NotFoundPage from "./pages/NotFoundPage";
-import RegisterPage from "./pages/RegisterPage";
+function App() {
+  const [status, setStatus] = useState("Connecting to backend...");
+  const [error, setError] = useState("");
 
-import ProtectedRoute from "./routes/ProtectedRoute";
-import PublicOnlyRoute from "./routes/PublicOnlyRoute";
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        const data = await getHealthStatus();
+        setStatus(data.message);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
 
-const App = () => {
+    checkBackend();
+  }, []);
+
   return (
-    <Routes>
-      <Route element={<PublicOnlyRoute />}>
-        <Route
-          path="/login"
-          element={<LoginPage />}
-        />
+    <main className="app">
+      <section className="status-card">
+        <h1>Soundify</h1>
+        <p>Music streaming application built with MERN Stack.</p>
 
-        <Route
-          path="/register"
-          element={<RegisterPage />}
-        />
-      </Route>
-
-      <Route element={<ProtectedRoute />}>
-        <Route
-          path="/"
-          element={<HomePage />}
-        />
-      </Route>
-
-      <Route
-        path="*"
-        element={<NotFoundPage />}
-      />
-    </Routes>
+        {error ? (
+          <p className="status error">{error}</p>
+        ) : (
+          <p className="status success">{status}</p>
+        )}
+      </section>
+    </main>
   );
-};
+}
 
 export default App;
