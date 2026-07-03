@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
-
+import authRouter from "./routes/auth.route.js";
 import healthRouter from "./routes/health.route.js";
 
 const app = express();
@@ -25,6 +25,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/health", healthRouter);
+app.use("/api/auth", authRouter);
 
 app.use((req, res) => {
   res.status(404).json({

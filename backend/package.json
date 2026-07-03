@@ -6,16 +6,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test:user-model": "node src/scripts/testUserModel.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-validator": "^7.3.2",
     "mongodb": "^7.4.0",
     "mongoose": "^9.7.3",
     "morgan": "^1.11.0"
