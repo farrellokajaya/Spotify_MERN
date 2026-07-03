@@ -1,11 +1,11 @@
 {
-  "name": "backend",
+  "name": "soundify-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend API for Soundify",
+  "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.js",
+    "dev": "nodemon",
     "start": "node src/server.js"
   },
   "keywords": [],

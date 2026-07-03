@@ -1,0 +1,44 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: #121212;
+}
+
+.status-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 40px;
+  text-align: center;
+  background-color: #181818;
+  border: 1px solid #282828;
+  border-radius: 16px;
+}
+
+.status-card h1 {
+  margin-bottom: 12px;
+  font-size: 48px;
+}
+
+.status-card p {
+  color: #b3b3b3;
+}
+
+.status {
+  margin-top: 24px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.success {
+  color: #1ed760;
+  background-color: rgba(30, 215, 96, 0.1);
+}
+
+.error {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+}
