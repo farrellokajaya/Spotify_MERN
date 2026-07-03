@@ -25,12 +25,34 @@ const registerValidation = [
     .bail()
     .isLength({ min: 8, max: 72 })
     .withMessage("Password harus terdiri dari 8 sampai 72 karakter")
+    .bail()
     .matches(/[a-z]/)
     .withMessage("Password harus memiliki minimal satu huruf kecil")
+    .bail()
     .matches(/[A-Z]/)
     .withMessage("Password harus memiliki minimal satu huruf besar")
+    .bail()
     .matches(/[0-9]/)
     .withMessage("Password harus memiliki minimal satu angka"),
 ];
 
-export { registerValidation };
+const loginValidation = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email wajib diisi")
+    .bail()
+    .isEmail()
+    .withMessage("Format email tidak valid")
+    .bail()
+    .customSanitizer((value) => value.toLowerCase()),
+
+  body("password")
+    .notEmpty()
+    .withMessage("Password wajib diisi"),
+];
+
+export {
+  registerValidation,
+  loginValidation,
+};
