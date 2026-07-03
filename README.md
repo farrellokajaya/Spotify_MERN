@@ -1,4 +1,4 @@
-# Soundify
+# SPOTIFY MERN
 
 Spotify Clone MERN Stack
 

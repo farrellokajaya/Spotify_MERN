@@ -1,36 +1,51 @@
-import express from "express";
 import cors from "cors";
-import morgan from "morgan";
-import authRouter from "./routes/auth.route.js";
-import healthRouter from "./routes/health.route.js";
+import express from "express";
+
+import authRoutes from "./routes/auth.route.js";
+import healthRoutes from "./routes/health.route.js";
 
 const app = express();
 
+const clientUrl =
+  process.env.CLIENT_URL || "http://localhost:5173";
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
-  }),
+    origin: clientUrl,
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+  })
 );
 
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
+app.use(
+  express.json({
+    limit: "10kb",
+  })
+);
 
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Welcome to the Soundify API",
-  });
-});
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
-app.use("/api/health", healthRouter);
-app.use("/api/auth", authRouter);
+app.use("/api/health", healthRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use((req, res) => {
-  res.status(404).json({
+  return res.status(404).json({
     success: false,
-    message: `Route ${req.method} ${req.originalUrl} was not found`,
+    message: "Endpoint tidak ditemukan",
   });
 });
 
