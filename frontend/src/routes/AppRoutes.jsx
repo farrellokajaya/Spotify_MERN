@@ -1,45 +1,50 @@
 import { Route, Routes } from "react-router";
+
+import AdminRoute from "../components/auth/AdminRoute";
 import GuestRoute from "../components/auth/GuestRoute";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+
+import AdminLayout from "../components/layout/AdminLayout";
+import MainLayout from "../components/layout/MainLayout";
+
 import HomePage from "../pages/HomePage";
+import LibraryPage from "../pages/LibraryPage";
 import LoginPage from "../pages/LoginPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import RegisterPage from "../pages/RegisterPage";
+import SearchPage from "../pages/SearchPage";
+
+import AdminAlbumsPage from "../pages/admin/AdminAlbumsPage";
+import AdminArtistsPage from "../pages/admin/AdminArtistsPage";
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
+import AdminSongsPage from "../pages/admin/AdminSongsPage";
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
+      <Route element={<GuestRoute />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
 
-      <Route
-        path="/login"
-        element={
-          <GuestRoute>
-            <LoginPage />
-          </GuestRoute>
-        }
-      />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<MainLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/library" element={<LibraryPage />} />
+        </Route>
+      </Route>
 
-      <Route
-        path="/register"
-        element={
-          <GuestRoute>
-            <RegisterPage />
-          </GuestRoute>
-        }
-      />
+      <Route element={<AdminRoute />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="artists" element={<AdminArtistsPage />} />
+          <Route path="albums" element={<AdminAlbumsPage />} />
+          <Route path="songs" element={<AdminSongsPage />} />
+        </Route>
+      </Route>
 
-      <Route
-        path="*"
-        element={<NotFoundPage />}
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

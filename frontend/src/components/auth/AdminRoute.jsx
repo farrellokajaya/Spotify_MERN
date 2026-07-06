@@ -1,15 +1,19 @@
-import { Navigate, Outlet, useLocation } from "react-router";
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+} from "react-router";
 
 import useAuth from "../../hooks/useAuth";
 
-function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+function AdminRoute() {
+  const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
     return (
       <main className="center-screen">
-        <p className="muted-text">Memeriksa sesi...</p>
+        <p className="muted-text">Memeriksa akses admin...</p>
       </main>
     );
   }
@@ -26,7 +30,11 @@ function ProtectedRoute({ children }) {
     );
   }
 
-  return children || <Outlet />;
+  if (user?.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
 }
 
-export default ProtectedRoute;
+export default AdminRoute;

@@ -1,0 +1,122 @@
+import { Router } from "express";
+
+import protect from "../middlewares/auth.middleware.js";
+import requireAdmin from "../middlewares/admin.middleware.js";
+
+import User from "../models/user.model.js";
+import Artist from "../models/artist.model.js";
+import Album from "../models/album.model.js";
+import Song from "../models/song.model.js";
+
+const router = Router();
+
+router.use(protect);
+router.use(requireAdmin);
+
+router.get("/dashboard", async (req, res) => {
+  try {
+    const [userCount, artistCount, albumCount, songCount] =
+      await Promise.all([
+        User.countDocuments(),
+        Artist.countDocuments(),
+        Album.countDocuments(),
+        Song.countDocuments(),
+      ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Data dashboard admin berhasil diambil",
+      data: {
+        users: userCount,
+        artists: artistCount,
+        albums: albumCount,
+        songs: songCount,
+      },
+    });
+  } catch (error) {
+    console.error("Admin dashboard error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Gagal mengambil data dashboard admin",
+    });
+  }
+});
+
+router.get("/artists", async (req, res) => {
+  try {
+    const artists = await Artist.find()
+      .sort({ createdAt: -1 })
+      .select("name slug genres isActive createdAt");
+
+    return res.status(200).json({
+      success: true,
+      message: "Data artist berhasil diambil",
+      data: {
+        artists,
+      },
+    });
+  } catch (error) {
+    console.error("Get admin artists error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Gagal mengambil data artist",
+    });
+  }
+});
+
+router.get("/albums", async (req, res) => {
+  try {
+    const albums = await Album.find()
+      .sort({ createdAt: -1 })
+      .populate("artist", "name slug")
+      .select(
+        "title slug artist type isPublished releaseDate createdAt",
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Data album berhasil diambil",
+      data: {
+        albums,
+      },
+    });
+  } catch (error) {
+    console.error("Get admin albums error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Gagal mengambil data album",
+    });
+  }
+});
+
+router.get("/songs", async (req, res) => {
+  try {
+    const songs = await Song.find()
+      .sort({ createdAt: -1 })
+      .populate("artist", "name slug")
+      .populate("album", "title slug")
+      .select(
+        "title slug artist album durationSeconds trackNumber isPublished playCount createdAt",
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Data lagu berhasil diambil",
+      data: {
+        songs,
+      },
+    });
+  } catch (error) {
+    console.error("Get admin songs error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Gagal mengambil data lagu",
+    });
+  }
+});
+
+export default router;

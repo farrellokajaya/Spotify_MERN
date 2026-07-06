@@ -1,4 +1,4 @@
-import { Navigate } from "react-router";
+import { Navigate, Outlet } from "react-router";
 import useAuth from "../../hooks/useAuth";
 
 function GuestRoute({ children }) {
@@ -16,7 +16,7 @@ function GuestRoute({ children }) {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return children || <Outlet />;
 }
 
 export default GuestRoute;

@@ -1,0 +1,121 @@
+.sf-admin-layout {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(30, 215, 96, 0.08),
+      transparent 30rem
+    ),
+    var(--sf-bg);
+}
+
+.sf-admin-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+.sf-admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 24px 18px;
+  border-right: 1px solid var(--sf-border);
+  background: rgba(11, 15, 14, 0.9);
+}
+
+.sf-admin-sidebar-header {
+  margin-bottom: 28px;
+  padding: 0 8px;
+}
+
+.sf-admin-badge {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--sf-accent-soft);
+  color: var(--sf-accent);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sf-admin-title {
+  margin: 14px 0 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.04em;
+}
+
+.sf-admin-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.sf-admin-main {
+  min-width: 0;
+  padding: 22px 24px 80px;
+}
+
+.sf-admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  margin-bottom: 22px;
+}
+
+.sf-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sf-admin-table-card {
+  overflow: hidden;
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--sf-surface);
+}
+
+.sf-admin-table-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--sf-border);
+}
+
+.sf-admin-table-title {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: -0.03em;
+}
+
+.sf-admin-table-subtitle {
+  margin: 8px 0 0;
+  color: var(--sf-muted);
+  font-size: 0.9rem;
+}
+
+.sf-admin-empty {
+  padding: 24px 20px;
+  color: var(--sf-muted);
+}
+
+@media (max-width: 980px) {
+  .sf-admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sf-admin-sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--sf-border);
+  }
+
+  .sf-admin-main {
+    padding: 18px 16px 90px;
+  }
+}
