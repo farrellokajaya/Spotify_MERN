@@ -10,6 +10,13 @@ const songSchema = new mongoose.Schema(
       maxlength: [120, "Judul lagu maksimal 120 karakter"],
     },
 
+    normalizedTitle: {
+      type: String,
+      required: [true, "Judul lagu wajib diisi"],
+      minlength: [1, "Judul lagu minimal 1 karakter"],
+      maxlength: [120, "Judul lagu maksimal 120 karakter"],
+    },
+
     slug: {
       type: String,
       required: [true, "Slug lagu wajib diisi"],
@@ -43,6 +50,7 @@ const songSchema = new mongoose.Schema(
     trackNumber: {
       type: Number,
       min: [1, "Nomor track minimal 1"],
+      max: [999, "Nomor track maksimal 999"],
       default: null,
     },
 
@@ -61,6 +69,7 @@ const songSchema = new mongoose.Schema(
     lyrics: {
       type: String,
       trim: true,
+      maxlength: [10000, "Lirik maksimal 10000 karakter"],
       default: "",
     },
 
@@ -91,9 +100,10 @@ const songSchema = new mongoose.Schema(
   },
 );
 
-songSchema.index({ artist: 1, title: 1 });
+songSchema.index({ artist: 1, normalizedTitle: 1 }, { unique: true });
+songSchema.index({ artist: 1, slug: 1 }, { unique: true });
+songSchema.index({ artist: 1, createdAt: -1 });
 songSchema.index({ album: 1, trackNumber: 1 });
-songSchema.index({ slug: 1 });
 songSchema.index({ isPublished: 1, createdAt: -1 });
 
 const Song = mongoose.model("Song", songSchema);

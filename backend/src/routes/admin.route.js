@@ -10,6 +10,7 @@ import Song from "../models/song.model.js";
 
 import adminAlbumRouter from "./adminAlbum.route.js";
 import adminArtistRouter from "./adminArtist.route.js";
+import adminSongRouter from "./adminSong.route.js";
 
 const router = Router();
 
@@ -48,32 +49,6 @@ router.get("/dashboard", async (req, res) => {
 
 router.use("/artists", adminArtistRouter);
 router.use("/albums", adminAlbumRouter);
-
-router.get("/songs", async (req, res) => {
-  try {
-    const songs = await Song.find()
-      .sort({ createdAt: -1 })
-      .populate("artist", "name slug")
-      .populate("album", "title slug")
-      .select(
-        "title slug artist album durationSeconds trackNumber isPublished playCount createdAt",
-      );
-
-    return res.status(200).json({
-      success: true,
-      message: "Data lagu berhasil diambil",
-      data: {
-        songs,
-      },
-    });
-  } catch (error) {
-    console.error("Get admin songs error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data lagu",
-    });
-  }
-});
+router.use("/songs", adminSongRouter);
 
 export default router;
