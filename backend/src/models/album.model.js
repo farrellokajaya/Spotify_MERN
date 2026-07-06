@@ -10,6 +10,13 @@ const albumSchema = new mongoose.Schema(
       maxlength: [120, "Judul album maksimal 120 karakter"],
     },
 
+    normalizedTitle: {
+      type: String,
+      required: [true, "Judul album wajib diisi"],
+      minlength: [2, "Judul album minimal 2 karakter"],
+      maxlength: [120, "Judul album maksimal 120 karakter"],
+    },
+
     slug: {
       type: String,
       required: [true, "Slug album wajib diisi"],
@@ -75,9 +82,15 @@ const albumSchema = new mongoose.Schema(
   },
 );
 
-albumSchema.index({ artist: 1, title: 1 }, { unique: true });
-albumSchema.index({ slug: 1 });
+albumSchema.index(
+  { artist: 1, normalizedTitle: 1 },
+  { unique: true },
+);
+
+albumSchema.index({ artist: 1, slug: 1 }, { unique: true });
+albumSchema.index({ artist: 1, title: 1 });
 albumSchema.index({ releaseDate: -1 });
+albumSchema.index({ isPublished: 1, createdAt: -1 });
 
 const Album = mongoose.model("Album", albumSchema);
 

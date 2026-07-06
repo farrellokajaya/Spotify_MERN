@@ -118,7 +118,9 @@
   .sf-admin-main {
     padding: 18px 16px 90px;
   }
-  .sf-admin-artist-page {
+}
+
+.sf-admin-artist-page {
   display: grid;
   gap: 18px;
 }
@@ -343,7 +345,8 @@
 }
 
 .sf-admin-form input,
-.sf-admin-form textarea {
+.sf-admin-form textarea,
+.sf-admin-form select {
   width: 100%;
   border: 1px solid var(--sf-border);
   border-radius: var(--sf-radius-sm);
@@ -352,7 +355,8 @@
   background: #0c1110;
 }
 
-.sf-admin-form input {
+.sf-admin-form input,
+.sf-admin-form select {
   min-height: 44px;
   padding: 0 12px;
 }
@@ -364,7 +368,8 @@
 }
 
 .sf-admin-form input:focus,
-.sf-admin-form textarea:focus {
+.sf-admin-form textarea:focus,
+.sf-admin-form select:focus {
   border-color: rgba(30, 215, 96, 0.7);
   box-shadow: 0 0 0 3px rgba(30, 215, 96, 0.12);
 }
@@ -410,6 +415,4 @@
   .sf-admin-table td {
     padding: 14px;
   }
-}
-
 }

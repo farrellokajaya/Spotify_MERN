@@ -88,3 +88,38 @@ export const deleteAdminArtist = (token, artistId) => {
     headers: createAuthHeaders(token),
   });
 };
+
+export const getAdminAlbums = (token) => {
+  return apiRequest("/api/admin/albums", {
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const getAdminAlbum = (token, albumId) => {
+  return apiRequest(`/api/admin/albums/${albumId}`, {
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const createAdminAlbum = (token, payload) => {
+  return apiRequest("/api/admin/albums", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: JSON.stringify(payload),
+  });
+};
+
+export const updateAdminAlbum = (token, albumId, payload) => {
+  return apiRequest(`/api/admin/albums/${albumId}`, {
+    method: "PUT",
+    headers: createAuthHeaders(token),
+    body: JSON.stringify(payload),
+  });
+};
+
+export const deleteAdminAlbum = (token, albumId) => {
+  return apiRequest(`/api/admin/albums/${albumId}`, {
+    method: "DELETE",
+    headers: createAuthHeaders(token),
+  });
+};

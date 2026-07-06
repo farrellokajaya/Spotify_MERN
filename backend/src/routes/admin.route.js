@@ -8,6 +8,7 @@ import Artist from "../models/artist.model.js";
 import Album from "../models/album.model.js";
 import Song from "../models/song.model.js";
 
+import adminAlbumRouter from "./adminAlbum.route.js";
 import adminArtistRouter from "./adminArtist.route.js";
 
 const router = Router();
@@ -46,32 +47,7 @@ router.get("/dashboard", async (req, res) => {
 });
 
 router.use("/artists", adminArtistRouter);
-
-router.get("/albums", async (req, res) => {
-  try {
-    const albums = await Album.find()
-      .sort({ createdAt: -1 })
-      .populate("artist", "name slug")
-      .select(
-        "title slug artist type isPublished releaseDate createdAt",
-      );
-
-    return res.status(200).json({
-      success: true,
-      message: "Data album berhasil diambil",
-      data: {
-        albums,
-      },
-    });
-  } catch (error) {
-    console.error("Get admin albums error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data album",
-    });
-  }
-});
+router.use("/albums", adminAlbumRouter);
 
 router.get("/songs", async (req, res) => {
   try {

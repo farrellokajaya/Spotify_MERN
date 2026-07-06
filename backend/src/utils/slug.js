@@ -7,14 +7,14 @@ const normalizeText = (value) => {
     .toLowerCase();
 };
 
-const generateSlug = (value) => {
+const generateSlug = (value, fallback = "item") => {
   const slug = normalizeText(value)
     .replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .replace(/-{2,}/g, "-");
 
-  return slug || "artist";
+  return slug || fallback;
 };
 
 export { generateSlug, normalizeText };

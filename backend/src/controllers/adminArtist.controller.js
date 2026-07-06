@@ -16,7 +16,7 @@ const formatArtist = (artist) => ({
 });
 
 const buildUniqueSlug = async (name, ignoredArtistId = null) => {
-  const baseSlug = generateSlug(name);
+  const baseSlug = generateSlug(name, "artist");
   let slug = baseSlug;
   let counter = 2;
 
