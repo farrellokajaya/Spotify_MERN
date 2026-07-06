@@ -8,6 +8,8 @@ import Artist from "../models/artist.model.js";
 import Album from "../models/album.model.js";
 import Song from "../models/song.model.js";
 
+import adminArtistRouter from "./adminArtist.route.js";
+
 const router = Router();
 
 router.use(protect);
@@ -43,28 +45,7 @@ router.get("/dashboard", async (req, res) => {
   }
 });
 
-router.get("/artists", async (req, res) => {
-  try {
-    const artists = await Artist.find()
-      .sort({ createdAt: -1 })
-      .select("name slug genres isActive createdAt");
-
-    return res.status(200).json({
-      success: true,
-      message: "Data artist berhasil diambil",
-      data: {
-        artists,
-      },
-    });
-  } catch (error) {
-    console.error("Get admin artists error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data artist",
-    });
-  }
-});
+router.use("/artists", adminArtistRouter);
 
 router.get("/albums", async (req, res) => {
   try {

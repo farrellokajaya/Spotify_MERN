@@ -10,6 +10,13 @@ const artistSchema = new mongoose.Schema(
       maxlength: [80, "Nama artist maksimal 80 karakter"],
     },
 
+    normalizedName: {
+      type: String,
+      required: [true, "Nama artist wajib diisi"],
+      minlength: [2, "Nama artist minimal 2 karakter"],
+      maxlength: [80, "Nama artist maksimal 80 karakter"],
+    },
+
     slug: {
       type: String,
       required: [true, "Slug artist wajib diisi"],
@@ -56,7 +63,9 @@ const artistSchema = new mongoose.Schema(
   },
 );
 
+artistSchema.index({ slug: 1 }, { unique: true });
 artistSchema.index({ name: 1 });
+artistSchema.index({ createdAt: -1 });
 
 const Artist = mongoose.model("Artist", artistSchema);
 
