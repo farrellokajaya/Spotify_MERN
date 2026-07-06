@@ -26,6 +26,10 @@ const apiRequest = async (path, options = {}) => {
   return data;
 };
 
+const createAuthHeaders = (token) => ({
+  Authorization: `Bearer ${token}`,
+});
+
 export const getHealthStatus = () => {
   return apiRequest("/api/health");
 };
@@ -46,8 +50,41 @@ export const loginUser = (payload) => {
 
 export const getCurrentUser = (token) => {
   return apiRequest("/api/auth/me", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const getAdminArtists = (token) => {
+  return apiRequest("/api/admin/artists", {
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const getAdminArtist = (token, artistId) => {
+  return apiRequest(`/api/admin/artists/${artistId}`, {
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const createAdminArtist = (token, payload) => {
+  return apiRequest("/api/admin/artists", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: JSON.stringify(payload),
+  });
+};
+
+export const updateAdminArtist = (token, artistId, payload) => {
+  return apiRequest(`/api/admin/artists/${artistId}`, {
+    method: "PUT",
+    headers: createAuthHeaders(token),
+    body: JSON.stringify(payload),
+  });
+};
+
+export const deleteAdminArtist = (token, artistId) => {
+  return apiRequest(`/api/admin/artists/${artistId}`, {
+    method: "DELETE",
+    headers: createAuthHeaders(token),
   });
 };
