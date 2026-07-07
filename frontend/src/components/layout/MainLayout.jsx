@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router";
 
 import useAuth from "../../hooks/useAuth";
 import MobileNavigation from "./MobileNavigation";
+import PlayerBar from "../player/PlayerBar";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
@@ -10,13 +11,12 @@ const pageMeta = {
     eyebrow: "Home",
     title: "Listen without the noise",
     subtitle:
-      "Fondasi Soundify sudah siap. Berikutnya kita akan mulai mengisi data artist, album, dan song.",
+      "Temukan lagu, album, dan artist yang sudah dipublikasikan di Soundify.",
   },
   "/search": {
     eyebrow: "Search",
     title: "Search your sound",
-    subtitle:
-      "Halaman pencarian sementara. Nanti akan dipakai untuk mencari lagu, artist, dan album.",
+    subtitle: "Cari lagu, artist, dan album dari katalog Soundify.",
   },
   "/library": {
     eyebrow: "Library",
@@ -53,6 +53,7 @@ function MainLayout() {
         </main>
 
         <MobileNavigation user={user} />
+        <PlayerBar />
       </div>
     </div>
   );

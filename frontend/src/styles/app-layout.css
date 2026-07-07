@@ -446,6 +446,312 @@ a {
   font-size: 1rem;
 }
 
+.sf-browse-page {
+  display: grid;
+  gap: 22px;
+}
+
+.sf-home-hero {
+  min-height: 320px;
+}
+
+.sf-alert {
+  padding: 14px 16px;
+  border-radius: var(--sf-radius-md);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.sf-alert-error {
+  border: 1px solid rgba(255, 107, 107, 0.35);
+  background: rgba(255, 107, 107, 0.1);
+  color: #ffd4d4;
+}
+
+.sf-empty-panel {
+  padding: 22px;
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  background: rgba(18, 23, 22, 0.72);
+  color: var(--sf-muted);
+}
+
+.sf-section-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.sf-section-header h2 {
+  margin: 0;
+  font-size: 1.22rem;
+  letter-spacing: -0.04em;
+}
+
+.sf-section-header p {
+  margin: 6px 0 0;
+  color: var(--sf-muted);
+  font-size: 0.92rem;
+}
+
+.sf-music-section {
+  display: grid;
+  gap: 12px;
+}
+
+.sf-music-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sf-music-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-md);
+  background: rgba(18, 23, 22, 0.78);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.sf-music-card:hover {
+  border-color: rgba(30, 215, 96, 0.38);
+  background: var(--sf-surface-soft);
+  transform: translateY(-2px);
+}
+
+.sf-music-cover-wrap {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #0c1110;
+}
+
+.sf-music-cover,
+.sf-music-cover-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.sf-music-cover {
+  display: block;
+  object-fit: cover;
+}
+
+.sf-music-cover-placeholder {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at top left, rgba(30, 215, 96, 0.26), transparent 60%),
+    #0c1110;
+  color: var(--sf-accent);
+  font-size: 2.2rem;
+  font-weight: 900;
+}
+
+.sf-artist-cover-wrap,
+.sf-artist-cover,
+.sf-artist-cover-placeholder {
+  border-radius: 999px;
+}
+
+.sf-play-button {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sf-accent);
+  color: #061009;
+  font-size: 0.95rem;
+  font-weight: 900;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.sf-music-card:hover .sf-play-button,
+.sf-play-button:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sf-music-card-body {
+  padding: 12px 2px 2px;
+}
+
+.sf-music-card-body h3 {
+  overflow: hidden;
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sf-music-card-body p {
+  overflow: hidden;
+  margin: 6px 0 0;
+  color: var(--sf-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sf-music-card-body span {
+  display: inline-flex;
+  margin-top: 10px;
+  color: var(--sf-muted-strong);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.sf-search-panel {
+  padding: clamp(20px, 3vw, 32px);
+}
+
+.sf-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.sf-search-form input {
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--sf-border);
+  border-radius: 999px;
+  outline: none;
+  background: #0c1110;
+  color: var(--sf-text);
+}
+
+.sf-search-form input:focus {
+  border-color: rgba(30, 215, 96, 0.7);
+  box-shadow: 0 0 0 3px rgba(30, 215, 96, 0.12);
+}
+
+.sf-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sf-player-bar {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  left: 278px;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid rgba(30, 215, 96, 0.24);
+  border-radius: 22px;
+  background: rgba(18, 23, 22, 0.96);
+  box-shadow: var(--sf-shadow);
+  backdrop-filter: blur(14px);
+}
+
+.sf-player-song {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.sf-player-cover,
+.sf-player-cover-placeholder {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 14px;
+}
+
+.sf-player-cover {
+  object-fit: cover;
+}
+
+.sf-player-cover-placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--sf-accent-soft);
+  color: var(--sf-accent);
+  font-weight: 900;
+}
+
+.sf-player-meta {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.sf-player-meta strong,
+.sf-player-meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sf-player-meta strong {
+  font-size: 0.95rem;
+}
+
+.sf-player-meta span {
+  color: var(--sf-muted);
+  font-size: 0.82rem;
+}
+
+.sf-player-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sf-player-button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--sf-border);
+  border-radius: 999px;
+  background: var(--sf-surface);
+  color: var(--sf-text);
+  font-weight: 800;
+}
+
+.sf-player-button.primary {
+  border-color: transparent;
+  background: var(--sf-accent);
+  color: #061009;
+}
+
+.sf-player-duration {
+  color: var(--sf-muted);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
 @media (max-width: 980px) {
   .sf-app-layout {
     grid-template-columns: 1fr;
@@ -465,6 +771,16 @@ a {
 
   .sf-grid-3 {
     grid-template-columns: 1fr;
+  }
+
+    .sf-music-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sf-player-bar {
+    right: 14px;
+    bottom: 86px;
+    left: 14px;
   }
 }
 
@@ -487,5 +803,22 @@ a {
 
   .sf-placeholder-item {
     flex-direction: column;
+  }
+
+    .sf-music-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sf-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .sf-player-bar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sf-player-controls {
+    justify-content: space-between;
   }
 }

@@ -158,3 +158,13 @@ export const deleteAdminSong = (token, songId) => {
     headers: createAuthHeaders(token),
   });
 };
+
+export const getMusicHome = () => {
+  return apiRequest("/api/music/home");
+};
+
+export const searchMusic = (query) => {
+  const searchParams = new URLSearchParams({ query });
+
+  return apiRequest(`/api/music/search?${searchParams.toString()}`);
+};
