@@ -12,6 +12,8 @@ import adminAlbumRouter from "./adminAlbum.route.js";
 import adminArtistRouter from "./adminArtist.route.js";
 import adminSongRouter from "./adminSong.route.js";
 
+import adminUploadRouter from "./adminUpload.route.js";
+
 const router = Router();
 
 router.use(protect);
@@ -50,5 +52,6 @@ router.get("/dashboard", async (req, res) => {
 router.use("/artists", adminArtistRouter);
 router.use("/albums", adminAlbumRouter);
 router.use("/songs", adminSongRouter);
+router.use("/upload", adminUploadRouter);
 
 export default router;
