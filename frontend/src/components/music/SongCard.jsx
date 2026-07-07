@@ -16,9 +16,22 @@ const getSongImage = (song) => {
 };
 
 function SongCard({ song }) {
-  const { currentSong, isPlaying, playSong, togglePlay } = usePlayer();
+  const { currentSong, isPlaying, isLoading, playSong, togglePlay } =
+    usePlayer();
   const isCurrentSong = currentSong?.id === song.id;
   const songImage = getSongImage(song);
+
+  const getButtonText = () => {
+    if (isCurrentSong && isLoading) {
+      return "…";
+    }
+
+    if (isCurrentSong && isPlaying) {
+      return "Ⅱ";
+    }
+
+    return "▶";
+  };
 
   const handlePlay = () => {
     if (isCurrentSong) {
@@ -30,7 +43,7 @@ function SongCard({ song }) {
   };
 
   return (
-    <article className="sf-music-card">
+    <article className={`sf-music-card ${isCurrentSong ? "is-active" : ""}`}>
       <div className="sf-music-cover-wrap">
         {songImage ? (
           <img
@@ -50,8 +63,9 @@ function SongCard({ song }) {
           className="sf-play-button"
           onClick={handlePlay}
           aria-label={`${isCurrentSong && isPlaying ? "Pause" : "Play"} ${song.title}`}
+          aria-pressed={isCurrentSong && isPlaying}
         >
-          {isCurrentSong && isPlaying ? "Ⅱ" : "▶"}
+          {getButtonText()}
         </button>
       </div>
 

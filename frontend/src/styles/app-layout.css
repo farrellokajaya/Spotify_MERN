@@ -519,7 +519,8 @@ a {
     transform 160ms ease;
 }
 
-.sf-music-card:hover {
+.sf-music-card:hover,
+.sf-music-card.is-active {
   border-color: rgba(30, 215, 96, 0.38);
   background: var(--sf-surface-soft);
   transform: translateY(-2px);
@@ -584,6 +585,7 @@ a {
 }
 
 .sf-music-card:hover .sf-play-button,
+.sf-music-card.is-active .sf-play-button,
 .sf-play-button:focus-visible {
   opacity: 1;
   transform: translateY(0);
@@ -664,9 +666,9 @@ a {
   left: 278px;
   z-index: 60;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 560px) auto;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   padding: 12px;
   border: 1px solid rgba(30, 215, 96, 0.24);
   border-radius: 22px;
@@ -684,10 +686,10 @@ a {
 
 .sf-player-cover,
 .sf-player-cover-placeholder {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 48px;
-  border-radius: 14px;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 15px;
 }
 
 .sf-player-cover {
@@ -724,9 +726,16 @@ a {
   font-size: 0.82rem;
 }
 
+.sf-player-center {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
 .sf-player-controls {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -738,12 +747,71 @@ a {
   background: var(--sf-surface);
   color: var(--sf-text);
   font-weight: 800;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.sf-player-button:hover:not(:disabled) {
+  border-color: rgba(30, 215, 96, 0.55);
+  transform: translateY(-1px);
+}
+
+.sf-player-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
 }
 
 .sf-player-button.primary {
+  min-width: 92px;
   border-color: transparent;
   background: var(--sf-accent);
   color: #061009;
+}
+
+.sf-player-status {
+  color: var(--sf-muted);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.sf-player-progress-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 10px;
+}
+
+.sf-player-time {
+  color: var(--sf-muted-strong);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  text-align: center;
+}
+
+.sf-player-progress {
+  width: 100%;
+  accent-color: var(--sf-accent);
+  cursor: pointer;
+}
+
+.sf-player-progress:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.sf-player-error {
+  margin: 0;
+  color: #ffd4d4;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.sf-player-close {
+  justify-self: end;
 }
 
 .sf-player-duration {
@@ -820,5 +888,13 @@ a {
 
   .sf-player-controls {
     justify-content: space-between;
+  }
+
+  .sf-player-progress-row {
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+  }
+
+  .sf-player-close {
+    justify-self: stretch;
   }
 }
