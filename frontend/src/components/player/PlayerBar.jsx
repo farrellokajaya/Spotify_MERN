@@ -15,7 +15,13 @@ const formatTime = (seconds) => {
 };
 
 const getSongImage = (song) => {
-  return song?.coverImageUrl || song?.artist?.imageUrl || "";
+  return (
+    song?.imageUrl ||
+    song?.coverImageUrl ||
+    song?.album?.imageUrl ||
+    song?.artist?.imageUrl ||
+    ""
+  );
 };
 
 function PlayerBar() {

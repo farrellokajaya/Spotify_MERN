@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+
+import adminRouter from "./routes/admin.route.js";
 import authRouter from "./routes/auth.route.js";
 import healthRouter from "./routes/health.route.js";
-import adminRouter from "./routes/admin.route.js";
-import musicRouter from "./routes/music.route.js"
+import musicRouter from "./routes/music.route.js";
+
 const app = express();
 
 app.use(

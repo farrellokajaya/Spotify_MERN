@@ -3,7 +3,13 @@ import multer from "multer";
 
 const ONE_MB = 1024 * 1024;
 
-const allowedImageMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+const allowedImageMimeTypes = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
 const allowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
 
 const allowedAudioMimeTypes = [
@@ -16,7 +22,9 @@ const allowedAudioMimeTypes = [
   "audio/wave",
   "audio/x-wav",
   "audio/ogg",
+  "application/ogg",
   "audio/mp4",
+  "audio/m4a",
   "audio/x-m4a",
   "application/octet-stream",
 ];
@@ -40,7 +48,9 @@ const createFileFilter = ({
     if (!isExtensionAllowed) {
       callback(
         new Error(
-          `Format ${typeLabel} tidak valid. Format yang diterima: ${allowedExtensions.join(", ")}`,
+          `Format ${typeLabel} tidak valid. Gunakan ${allowedExtensions.join(
+            ", ",
+          )}.`,
         ),
       );
       return;
@@ -49,7 +59,7 @@ const createFileFilter = ({
     if (!isMimeTypeAllowed) {
       callback(
         new Error(
-          `MIME type ${typeLabel} tidak valid: ${file.mimetype}. Format yang diterima: ${allowedExtensions.join(", ")}`,
+          `Tipe file ${typeLabel} tidak valid. File terdeteksi sebagai ${file.mimetype}.`,
         ),
       );
       return;
@@ -60,7 +70,6 @@ const createFileFilter = ({
 };
 
 const createUploadMiddleware = ({
-  fieldName,
   maxFileSize,
   allowedMimeTypes,
   allowedExtensions,
@@ -77,7 +86,7 @@ const createUploadMiddleware = ({
       allowedExtensions,
       typeLabel,
     }),
-  }).single(fieldName);
+  }).single("file");
 
   return (req, res, next) => {
     upload(req, res, (error) => {
@@ -89,9 +98,11 @@ const createUploadMiddleware = ({
       if (error instanceof multer.MulterError) {
         const message =
           error.code === "LIMIT_FILE_SIZE"
-            ? `${typeLabel} terlalu besar. Maksimal ${Math.round(maxFileSize / ONE_MB)}MB.`
+            ? `${typeLabel} terlalu besar. Maksimal ${Math.round(
+                maxFileSize / ONE_MB,
+              )}MB.`
             : error.code === "LIMIT_UNEXPECTED_FILE"
-              ? `Field upload tidak sesuai. Gunakan field name "${fieldName}".`
+              ? 'Field upload tidak sesuai. Gunakan field name "file".'
               : error.message;
 
         return res.status(400).json({
@@ -102,14 +113,13 @@ const createUploadMiddleware = ({
 
       return res.status(400).json({
         success: false,
-        message: error.message || `Upload ${typeLabel} tidak valid`,
+        message: error.message || `Upload ${typeLabel} tidak valid.`,
       });
     });
   };
 };
 
 const uploadImageFile = createUploadMiddleware({
-  fieldName: "image",
   maxFileSize: 5 * ONE_MB,
   allowedMimeTypes: allowedImageMimeTypes,
   allowedExtensions: allowedImageExtensions,
@@ -117,7 +127,6 @@ const uploadImageFile = createUploadMiddleware({
 });
 
 const uploadAudioFile = createUploadMiddleware({
-  fieldName: "audio",
   maxFileSize: 25 * ONE_MB,
   allowedMimeTypes: allowedAudioMimeTypes,
   allowedExtensions: allowedAudioExtensions,

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import MediaUploadField from "../../components/admin/MediaUploadField";
 
 import useAuth from "../../hooks/useAuth";
 import {
@@ -525,24 +526,35 @@ function AdminSongsPage() {
 
             <label>
               <span>Audio URL</span>
-              <input
-                type="url"
-                name="audioUrl"
-                value={form.audioUrl}
-                onChange={handleChange}
-                placeholder="https://example.com/audio/song.mp3"
-                required
-              />
+                <MediaUploadField
+                  label="Song Audio"
+                  type="audio"
+                  value={form.audioUrl}
+                  onChange={(url) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      audioUrl: url,
+                    }))
+                  }
+                  placeholder="Masukkan audioUrl song atau upload audio"
+                  helperText="Format: mp3, wav, ogg, m4a. Maksimal 25MB."
+                />
             </label>
 
             <label>
-              <span>Cover Image URL</span>
-              <input
-                type="url"
-                name="coverImageUrl"
+              <span>Cover Image</span>
+              <MediaUploadField
+                label="Song Cover"
+                type="image"
                 value={form.coverImageUrl}
-                onChange={handleChange}
-                placeholder="https://example.com/cover.jpg"
+                onChange={(url) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    coverImageUrl: url,
+                  }))
+                }
+                placeholder="Masukkan coverImageUrl song atau upload cover"
+                helperText="Format: jpg, jpeg, png, webp. Maksimal 5MB."
               />
             </label>
 

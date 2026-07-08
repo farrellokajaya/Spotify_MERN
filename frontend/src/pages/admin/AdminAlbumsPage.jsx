@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import MediaUploadField from "../../components/admin/MediaUploadField";
 
 import useAuth from "../../hooks/useAuth";
 import {
@@ -462,13 +463,19 @@ function AdminAlbumsPage() {
             </label>
 
             <label>
-              <span>Cover Image URL</span>
-              <input
-                type="url"
-                name="coverImageUrl"
+              <span>Cover Image</span>
+              <MediaUploadField
+                label="Album Cover"
+                type="image"
                 value={form.coverImageUrl}
-                onChange={handleChange}
-                placeholder="https://example.com/cover.jpg"
+                onChange={(url) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    coverImageUrl: url,
+                  }))
+                }
+                placeholder="Masukkan coverImageUrl album atau upload cover"
+                helperText="Format: jpg, jpeg, png, webp. Maksimal 5MB."
               />
             </label>
 

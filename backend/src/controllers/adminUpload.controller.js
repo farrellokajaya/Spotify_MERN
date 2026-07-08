@@ -1,20 +1,12 @@
 import uploadImageToCloudinary from "../utils/cloudinaryUpload.js";
 import uploadAudioToSupabase from "../utils/supabaseUpload.js";
 
-const getDevelopmentDetail = (error) => {
-  if (process.env.NODE_ENV !== "production") {
-    return { detail: error.message };
-  }
-
-  return {};
-};
-
 const uploadAdminImage = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'File image wajib dikirim dengan field name "image"',
+        message: "File image belum dipilih.",
       });
     }
 
@@ -22,16 +14,25 @@ const uploadAdminImage = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Image berhasil diupload ke Cloudinary",
-      data: uploadedImage,
+      message: "Image berhasil diupload ke Cloudinary.",
+      data: {
+        imageUrl: uploadedImage.secureUrl,
+        secureUrl: uploadedImage.secureUrl,
+        publicId: uploadedImage.publicId,
+        format: uploadedImage.format,
+        bytes: uploadedImage.bytes,
+        width: uploadedImage.width,
+        height: uploadedImage.height,
+      },
     });
   } catch (error) {
     console.error("Upload admin image error:", error);
 
-    return res.status(502).json({
+    return res.status(500).json({
       success: false,
-      message: "Gagal upload image ke Cloudinary",
-      ...getDevelopmentDetail(error),
+      message:
+        error.message ||
+        "Upload image gagal. Periksa credential Cloudinary dan coba lagi.",
     });
   }
 };
@@ -41,7 +42,7 @@ const uploadAdminAudio = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'File audio wajib dikirim dengan field name "audio"',
+        message: "File audio belum dipilih.",
       });
     }
 
@@ -49,16 +50,23 @@ const uploadAdminAudio = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Audio berhasil diupload ke Supabase Storage",
-      data: uploadedAudio,
+      message: "Audio berhasil diupload ke Supabase Storage.",
+      data: {
+        audioUrl: uploadedAudio.audioUrl,
+        bucket: uploadedAudio.bucket,
+        path: uploadedAudio.path,
+        contentType: uploadedAudio.contentType,
+        size: uploadedAudio.size,
+      },
     });
   } catch (error) {
     console.error("Upload admin audio error:", error);
 
-    return res.status(502).json({
+    return res.status(500).json({
       success: false,
-      message: "Gagal upload audio ke Supabase Storage",
-      ...getDevelopmentDetail(error),
+      message:
+        error.message ||
+        "Upload audio gagal. Periksa credential Supabase, bucket, dan coba lagi.",
     });
   }
 };
