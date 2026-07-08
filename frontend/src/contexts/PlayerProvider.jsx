@@ -12,7 +12,7 @@ import { recordSongPlay } from "../services/api";
 
 const getAudioUrl = (song) => song?.audioUrl?.trim() || "";
 
-const getSongId = (song) => String(song?.id || "");
+const getSongId = (song) => String(song?.id || song?._id || "");
 
 const getFallbackDuration = (song) => {
   const durationSeconds = Number(song?.durationSeconds);
@@ -32,16 +32,64 @@ const getSafeTime = (time) => {
   return time;
 };
 
+const buildUniqueSongs = (songs = []) => {
+  const songMap = new Map();
+
+  songs.forEach((song) => {
+    const songId = getSongId(song);
+
+    if (songId && !songMap.has(songId)) {
+      songMap.set(songId, song);
+    }
+  });
+
+  return Array.from(songMap.values());
+};
+
+const getRandomIndex = (totalSongs, currentIndex) => {
+  if (totalSongs <= 1) {
+    return currentIndex;
+  }
+
+  let nextIndex = currentIndex;
+
+  while (nextIndex === currentIndex) {
+    nextIndex = Math.floor(Math.random() * totalSongs);
+  }
+
+  return nextIndex;
+};
+
 function PlayerProvider({ children }) {
   const audioRef = useRef(null);
+  const lastRecordedSongIdRef = useRef("");
+  const queueNoticeTimerRef = useRef(null);
+  const { token, isAuthenticated } = useAuth();
+
   const [currentSong, setCurrentSong] = useState(null);
+  const [queueSongs, setQueueSongs] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [isShuffle, setIsShuffle] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState("");
-  const { token, isAuthenticated } = useAuth();
-  const lastRecordedSongIdRef = useRef("");
+  const [queueNotice, setQueueNotice] = useState("");
+
+  const showQueueNotice = useCallback((message) => {
+  if (queueNoticeTimerRef.current) {
+    window.clearTimeout(queueNoticeTimerRef.current);
+  }
+
+  setQueueNotice(message);
+
+  queueNoticeTimerRef.current = window.setTimeout(() => {
+    setQueueNotice("");
+    queueNoticeTimerRef.current = null;
+  }, 2200);
+  }, []);
 
   const pauseAudioElement = useCallback(() => {
     const audio = audioRef.current;
@@ -62,32 +110,35 @@ function PlayerProvider({ children }) {
     }
   }, []);
 
-  const recordPlaySafely = useCallback((song) => {
-    const songId = getSongId(song);
+  const recordPlaySafely = useCallback(
+    (song) => {
+      const songId = getSongId(song);
 
-    if (!isAuthenticated || !token || !songId) {
-      return;
-    }
-
-    if (lastRecordedSongIdRef.current === songId) {
-      return;
-    }
-
-    lastRecordedSongIdRef.current = songId;
-
-    recordSongPlay(token, songId).catch(() => {
-      if (lastRecordedSongIdRef.current === songId) {
-        lastRecordedSongIdRef.current = "";
+      if (!isAuthenticated || !token || !songId) {
+        return;
       }
-    });
-    },[isAuthenticated, token],
+
+      if (lastRecordedSongIdRef.current === songId) {
+        return;
+      }
+
+      lastRecordedSongIdRef.current = songId;
+
+      recordSongPlay(token, songId).catch(() => {
+        if (lastRecordedSongIdRef.current === songId) {
+          lastRecordedSongIdRef.current = "";
+        }
+      });
+    },
+    [isAuthenticated, token],
   );
 
-  const playSong = useCallback(
-    (song) => {
+  const startSong = useCallback(
+    (song, index) => {
       const audioUrl = getAudioUrl(song);
 
       setCurrentSong(song);
+      setCurrentIndex(index);
       setCurrentTime(0);
       setDuration(getFallbackDuration(song));
       setError("");
@@ -104,6 +155,45 @@ function PlayerProvider({ children }) {
       setIsPlaying(true);
     },
     [recordPlaySafely],
+  );
+
+  const playSong = useCallback(
+    (song) => {
+      if (!song) {
+        return;
+      }
+
+      setQueueSongs([song]);
+      startSong(song, 0);
+    },
+    [startSong],
+  );
+
+  const playSongList = useCallback(
+    (songs = [], startSongItem) => {
+      const uniqueSongs = buildUniqueSongs(songs);
+      const targetSong = startSongItem || uniqueSongs[0];
+      const targetSongId = getSongId(targetSong);
+
+      if (!targetSongId) {
+        return;
+      }
+
+      let targetIndex = uniqueSongs.findIndex((song) => {
+        return getSongId(song) === targetSongId;
+      });
+
+      let nextQueue = uniqueSongs;
+
+      if (targetIndex < 0) {
+        nextQueue = buildUniqueSongs([targetSong, ...uniqueSongs]);
+        targetIndex = 0;
+      }
+
+      setQueueSongs(nextQueue);
+      startSong(nextQueue[targetIndex], targetIndex);
+    },
+    [startSong],
   );
 
   const pauseSong = useCallback(() => {
@@ -127,9 +217,176 @@ function PlayerProvider({ children }) {
     setIsPlaying((currentValue) => !currentValue);
   }, [currentSong]);
 
+  const playNext = useCallback(() => {
+    if (!queueSongs.length) {
+      setIsPlaying(false);
+      setIsLoading(false);
+      return;
+    }
+
+    if (currentIndex < 0) {
+      startSong(queueSongs[0], 0);
+      return;
+    }
+
+    if (isShuffle) {
+      const nextIndex = getRandomIndex(queueSongs.length, currentIndex);
+      startSong(queueSongs[nextIndex], nextIndex);
+      return;
+    }
+
+    const nextIndex = currentIndex + 1;
+
+    if (nextIndex < queueSongs.length) {
+      startSong(queueSongs[nextIndex], nextIndex);
+      return;
+    }
+
+    if (isRepeat) {
+      startSong(queueSongs[0], 0);
+      return;
+    }
+
+    setIsPlaying(false);
+    setIsLoading(false);
+    setCurrentTime(0);
+  }, [currentIndex, isRepeat, isShuffle, queueSongs, startSong]);
+
+  const playPrevious = useCallback(() => {
+    if (!queueSongs.length || currentIndex < 0) {
+      setIsPlaying(false);
+      setIsLoading(false);
+      return;
+    }
+
+    if (isShuffle) {
+      const previousIndex = getRandomIndex(queueSongs.length, currentIndex);
+      startSong(queueSongs[previousIndex], previousIndex);
+      return;
+    }
+
+    const previousIndex = currentIndex - 1;
+
+    if (previousIndex >= 0) {
+      startSong(queueSongs[previousIndex], previousIndex);
+      return;
+    }
+
+    if (isRepeat) {
+      const lastIndex = queueSongs.length - 1;
+      startSong(queueSongs[lastIndex], lastIndex);
+      return;
+    }
+
+    startSong(queueSongs[0], 0);
+  }, [currentIndex, isRepeat, isShuffle, queueSongs, startSong]);
+
+  const addToQueue = useCallback(
+    (song) => {
+      const songId = getSongId(song);
+
+      if (!songId) {
+        showQueueNotice("Song tidak valid dan gagal dimasukkan ke queue.");
+        return false;
+      }
+
+      const alreadyExists = queueSongs.some((queueSong) => {
+        return getSongId(queueSong) === songId;
+      });
+
+      if (alreadyExists) {
+        showQueueNotice(`${song.title} sudah ada di queue.`);
+        return false;
+      }
+
+      setQueueSongs((currentQueue) => {
+        const existsInCurrentQueue = currentQueue.some((queueSong) => {
+          return getSongId(queueSong) === songId;
+        });
+
+        if (existsInCurrentQueue) {
+          return currentQueue;
+        }
+
+        return [...currentQueue, song];
+      });
+
+      showQueueNotice(`${song.title} berhasil dimasukkan ke queue.`);
+      return true;
+    },
+    [queueSongs, showQueueNotice],
+  );
+
+  const removeFromQueue = useCallback(
+    (songId) => {
+      const targetSongId = String(songId || "");
+
+      if (!targetSongId) {
+        return;
+      }
+
+      const removedIndex = queueSongs.findIndex((song) => {
+        return getSongId(song) === targetSongId;
+      });
+
+      if (removedIndex < 0) {
+        return;
+      }
+
+      const nextQueue = queueSongs.filter((song) => {
+        return getSongId(song) !== targetSongId;
+      });
+
+      setQueueSongs(nextQueue);
+
+      if (getSongId(currentSong) === targetSongId) {
+        const nextSong = nextQueue[removedIndex] || nextQueue[removedIndex - 1];
+
+        if (nextSong) {
+          const nextIndex = nextQueue.findIndex((song) => {
+            return getSongId(song) === getSongId(nextSong);
+          });
+
+          startSong(nextSong, nextIndex);
+          return;
+        }
+
+        resetAudioElement();
+        setCurrentSong(null);
+        setCurrentIndex(-1);
+        setIsPlaying(false);
+        setIsLoading(false);
+        setCurrentTime(0);
+        setDuration(0);
+        setError("");
+        return;
+      }
+
+      if (removedIndex < currentIndex) {
+        setCurrentIndex((index) => Math.max(index - 1, 0));
+      }
+    },
+    [currentIndex, currentSong, queueSongs, resetAudioElement, startSong],
+  );
+
+  const clearQueue = useCallback(() => {
+    setQueueSongs(currentSong ? [currentSong] : []);
+    setCurrentIndex(currentSong ? 0 : -1);
+  }, [currentSong]);
+
+  const toggleShuffle = useCallback(() => {
+    setIsShuffle((currentValue) => !currentValue);
+  }, []);
+
+  const toggleRepeat = useCallback(() => {
+    setIsRepeat((currentValue) => !currentValue);
+  }, []);
+
   const clearPlayer = useCallback(() => {
     resetAudioElement();
     setCurrentSong(null);
+    setQueueSongs([]);
+    setCurrentIndex(-1);
     setIsPlaying(false);
     setIsLoading(false);
     setCurrentTime(0);
@@ -184,10 +441,10 @@ function PlayerProvider({ children }) {
       audio.currentTime = 0;
     }
 
-    setIsPlaying(false);
-    setIsLoading(false);
     setCurrentTime(0);
-  }, []);
+    setIsLoading(false);
+    playNext();
+  }, [playNext]);
 
   const handleError = useCallback(() => {
     if (!currentSong) {
@@ -261,38 +518,96 @@ function PlayerProvider({ children }) {
     }
   }, [currentSong, isPlaying]);
 
-  const value = useMemo(
-    () => ({
-      currentSong,
-      isPlaying,
-      isLoading,
-      currentTime,
-      duration,
-      error,
-      playSong,
-      pauseSong,
-      togglePlay,
-      seekTo,
-      clearPlayer,
-    }),
-    [
-      clearPlayer,
-      currentSong,
-      currentTime,
-      duration,
-      error,
-      isLoading,
-      isPlaying,
-      pauseSong,
-      playSong,
-      seekTo,
-      togglePlay,
-    ],
-  );
+  const previousSong = useMemo(() => {
+    return currentIndex > 0 ? queueSongs[currentIndex - 1] : null;
+  }, [currentIndex, queueSongs]);
+
+  const nextSong = useMemo(() => {
+    return currentIndex >= 0 ? queueSongs[currentIndex + 1] || null : null;
+  }, [currentIndex, queueSongs]);
+
+  const upNextSongs = useMemo(() => {
+    return currentIndex >= 0 ? queueSongs.slice(currentIndex + 1) : [];
+  }, [currentIndex, queueSongs]);
+
+    useEffect(() => {
+      return () => {
+        if (queueNoticeTimerRef.current) {
+          window.clearTimeout(queueNoticeTimerRef.current);
+        }
+      };
+    }, []);
+
+
+const value = useMemo(
+  () => ({
+    currentSong,
+    queueSongs,
+    currentIndex,
+    previousSong,
+    nextSong,
+    upNextSongs,
+    isShuffle,
+    isRepeat,
+    isPlaying,
+    isLoading,
+    currentTime,
+    duration,
+    error,
+    playSong,
+    playSongList,
+    pauseSong,
+    togglePlay,
+    playNext,
+    playPrevious,
+    addToQueue,
+    removeFromQueue,
+    clearQueue,
+    toggleShuffle,
+    toggleRepeat,
+    seekTo,
+    clearPlayer,
+  }),
+  [
+    addToQueue,
+    clearPlayer,
+    clearQueue,
+    currentIndex,
+    currentSong,
+    currentTime,
+    duration,
+    error,
+    isLoading,
+    isPlaying,
+    isRepeat,
+    isShuffle,
+    nextSong,
+    pauseSong,
+    playNext,
+    playPrevious,
+    playSong,
+    playSongList,
+    previousSong,
+    queueSongs,
+    removeFromQueue,
+    seekTo,
+    togglePlay,
+    toggleRepeat,
+    toggleShuffle,
+    upNextSongs,
+  ],
+);
 
   return (
     <PlayerContext.Provider value={value}>
       {children}
+
+      {queueNotice ? (
+        <div className="sf-queue-toast" role="status" aria-live="polite">
+          {queueNotice}
+        </div>
+      ) : null}
+
       <audio
         ref={audioRef}
         preload="metadata"

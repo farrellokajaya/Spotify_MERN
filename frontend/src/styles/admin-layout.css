@@ -416,3 +416,30 @@
     padding: 14px;
   }
 }
+
+.sf-playlist-hero-actions {
+  margin-top: 14px;
+}
+
+.sf-player-button {
+  min-width: 42px;
+}
+
+.sf-player-button.is-active {
+  border-color: rgba(30, 215, 96, 0.55);
+  background: var(--sf-accent-soft);
+  color: var(--sf-accent);
+}
+
+.sf-add-queue-button {
+  min-width: 42px;
+}
+
+.sf-queue-section-title {
+  padding: 10px 12px 6px;
+  color: var(--sf-accent);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}

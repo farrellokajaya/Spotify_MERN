@@ -141,6 +141,7 @@ function RecentlyPlayedPage() {
             <SongCard
               key={item.id}
               song={item.song}
+              songs={history.map((historyItem) => historyItem.song)}
               metaText={formatPlayedAt(item.playedAt)}
             />
           ))}

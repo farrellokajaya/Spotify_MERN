@@ -135,7 +135,7 @@ function ArtistDetailPage() {
         emptyMessage="Artist ini belum memiliki song published."
       >
         {songs.map((song) => (
-          <SongCard key={song.id} song={song} />
+          <SongCard key={song.id} song={song} songs={songs} />
         ))}
       </MusicSection>
     </section>

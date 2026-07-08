@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 
 import useAuth from "../hooks/useAuth";
@@ -29,15 +29,40 @@ const getSongImage = (song) => {
   return song.coverImageUrl || song.album?.coverImageUrl || song.artist?.imageUrl || "";
 };
 
+const shuffleSongs = (songs) => {
+  const shuffledSongs = [...songs];
+
+  for (let index = shuffledSongs.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    const currentSong = shuffledSongs[index];
+
+    shuffledSongs[index] = shuffledSongs[randomIndex];
+    shuffledSongs[randomIndex] = currentSong;
+  }
+
+  return shuffledSongs;
+};
+
 function PlaylistDetailPage() {
   const { id } = useParams();
   const { token } = useAuth();
-  const { currentSong, isPlaying, isLoading, playSong, togglePlay } =
-    usePlayer();
+  const {
+    currentSong,
+    isPlaying,
+    isLoading,
+    playSong,
+    playSongList,
+    togglePlay,
+    addToQueue,
+  } = usePlayer();
+
   const [detail, setDetail] = useState(initialDetail);
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState("");
   const [error, setError] = useState("");
+
+  const playlist = detail.playlist;
+  const songs = useMemo(() => playlist?.songs || [], [playlist]);
 
   const loadPlaylistDetail = useCallback(async () => {
     if (!token) {
@@ -79,7 +104,40 @@ function PlaylistDetailPage() {
       return;
     }
 
+    if (songs.length > 0) {
+      playSongList(songs, song);
+      return;
+    }
+
     playSong(song);
+  };
+
+  const handlePlayAll = () => {
+    if (!songs.length) {
+      return;
+    }
+
+    playSongList(songs, songs[0]);
+  };
+
+  const handleShufflePlay = () => {
+    if (!songs.length) {
+      return;
+    }
+
+    const shuffledSongs = shuffleSongs(songs);
+
+    playSongList(shuffledSongs, shuffledSongs[0]);
+  };
+
+  const handleAddToQueue = (song) => {
+    addToQueue(song);
+  };
+
+  const handleQueueAll = () => {
+    songs.forEach((song) => {
+      addToQueue(song);
+    });
   };
 
   const getPlayText = (song) => {
@@ -104,19 +162,19 @@ function PlaylistDetailPage() {
       await removeSongFromPlaylist(token, id, song.id);
 
       setDetail((currentDetail) => {
-        const playlist = currentDetail.playlist;
+        const currentPlaylist = currentDetail.playlist;
 
-        if (!playlist) {
+        if (!currentPlaylist) {
           return currentDetail;
         }
 
         return {
           playlist: {
-            ...playlist,
-            songs: playlist.songs.filter((currentSongItem) => {
+            ...currentPlaylist,
+            songs: currentPlaylist.songs.filter((currentSongItem) => {
               return currentSongItem.id !== song.id;
             }),
-            songCount: Math.max(Number(playlist.songCount || 1) - 1, 0),
+            songCount: Math.max(Number(currentPlaylist.songCount || 1) - 1, 0),
           },
         };
       });
@@ -131,7 +189,7 @@ function PlaylistDetailPage() {
     return <div className="sf-empty-panel">Memuat detail playlist...</div>;
   }
 
-  if (error && !detail.playlist) {
+  if (error && !playlist) {
     return (
       <section className="sf-browse-page">
         <div className="sf-alert sf-alert-error" role="alert">
@@ -145,7 +203,7 @@ function PlaylistDetailPage() {
     );
   }
 
-  if (!detail.playlist) {
+  if (!playlist) {
     return (
       <section className="sf-browse-page">
         <div className="sf-empty-panel">Playlist tidak ditemukan.</div>
@@ -156,9 +214,6 @@ function PlaylistDetailPage() {
       </section>
     );
   }
-
-  const { playlist } = detail;
-  const songs = playlist.songs || [];
 
   return (
     <section className="sf-browse-page">
@@ -173,11 +228,41 @@ function PlaylistDetailPage() {
           <p className="sf-detail-description">
             {playlist.description || "Playlist pribadi tanpa deskripsi."}
           </p>
+
           <div className="sf-detail-meta-row">
             <span>{songs.length} song</span>
             <Link to="/playlists" className="sf-detail-link">
               Back to Playlists
             </Link>
+          </div>
+
+          <div className="sf-button-row sf-playlist-hero-actions">
+            <button
+              type="button"
+              className="sf-button sf-button-primary"
+              onClick={handlePlayAll}
+              disabled={!songs.length}
+            >
+              Play All
+            </button>
+
+            <button
+              type="button"
+              className="sf-button sf-button-secondary"
+              onClick={handleShufflePlay}
+              disabled={!songs.length}
+            >
+              Shuffle Play
+            </button>
+
+            <button
+              type="button"
+              className="sf-button sf-button-secondary"
+              onClick={handleQueueAll}
+              disabled={!songs.length}
+            >
+              Queue All
+            </button>
           </div>
         </div>
       </div>
@@ -233,6 +318,14 @@ function PlaylistDetailPage() {
                     onClick={() => handlePlay(song)}
                   >
                     {getPlayText(song)}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="sf-button sf-button-secondary"
+                    onClick={() => handleAddToQueue(song)}
+                  >
+                    Queue
                   </button>
 
                   <button

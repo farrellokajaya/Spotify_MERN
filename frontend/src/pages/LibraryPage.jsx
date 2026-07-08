@@ -46,7 +46,7 @@ export default function LibraryPage() {
           emptyMessage="Belum ada favorite song. Tambahkan lagu dari Home, Search, Artist Detail, atau Album Detail."
         >
           {favoriteSongs.map((song) => (
-            <SongCard key={song.id} song={song} />
+            <SongCard key={song.id} song={song} songs={favoriteSongs} />
           ))}
         </MusicSection>
       ) : null}

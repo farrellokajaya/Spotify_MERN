@@ -102,7 +102,7 @@ function SearchPage() {
             emptyMessage="Tidak ada lagu."
           >
             {results.songs.map((song) => (
-              <SongCard key={song.id} song={song} />
+              <SongCard key={song.id} song={song} songs={results.songs} />
             ))}
           </MusicSection>
 

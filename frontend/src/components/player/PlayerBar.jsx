@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 import usePlayer from "../../hooks/usePlayer";
 
 const formatTime = (seconds) => {
@@ -30,10 +32,17 @@ function PlayerBar() {
     currentSong,
     isPlaying,
     isLoading,
+    isShuffle,
+    isRepeat,
+    upNextSongs,
     currentTime,
     duration,
     error,
     togglePlay,
+    playNext,
+    playPrevious,
+    toggleShuffle,
+    toggleRepeat,
     seekTo,
     clearPlayer,
   } = usePlayer();
@@ -47,6 +56,7 @@ function PlayerBar() {
   const canSeek = duration > 0 && !isLoading && !error;
   const buttonText = isLoading ? "…" : isPlaying ? "Ⅱ" : "▶";
   const buttonLabel = isLoading ? "Loading" : isPlaying ? "Pause" : "Play";
+  const firstUpNextSong = upNextSongs[0];
 
   return (
     <aside className="sf-player-bar" aria-label="Now playing">
@@ -69,14 +79,54 @@ function PlayerBar() {
       </div>
 
       <div className="sf-player-center">
-        <button
-          type="button"
-          className="sf-player-main-button"
-          onClick={togglePlay}
-          aria-label={`${buttonLabel} current song`}
-        >
-          {buttonText}
-        </button>
+        <div className="sf-player-controls">
+          <button
+            type="button"
+            className={`sf-player-button ${isShuffle ? "is-active" : ""}`}
+            onClick={toggleShuffle}
+            aria-label={`${isShuffle ? "Disable" : "Enable"} shuffle`}
+            aria-pressed={isShuffle}
+          >
+            Shuffle
+          </button>
+
+          <button
+            type="button"
+            className="sf-player-button"
+            onClick={playPrevious}
+            aria-label="Play previous song"
+          >
+            ‹‹
+          </button>
+
+          <button
+            type="button"
+            className="sf-player-main-button"
+            onClick={togglePlay}
+            aria-label={`${buttonLabel} current song`}
+          >
+            {buttonText}
+          </button>
+
+          <button
+            type="button"
+            className="sf-player-button"
+            onClick={playNext}
+            aria-label="Play next song"
+          >
+            ››
+          </button>
+
+          <button
+            type="button"
+            className={`sf-player-button ${isRepeat ? "is-active" : ""}`}
+            onClick={toggleRepeat}
+            aria-label={`${isRepeat ? "Disable" : "Enable"} repeat queue`}
+            aria-pressed={isRepeat}
+          >
+            Repeat
+          </button>
+        </div>
 
         <div className="sf-player-progress-row">
           <span className="sf-player-time">{formatTime(currentTime)}</span>
@@ -95,6 +145,16 @@ function PlayerBar() {
 
           <span className="sf-player-time">{formatTime(duration)}</span>
         </div>
+
+        {firstUpNextSong ? (
+          <Link to="/queue" className="sf-player-up-next">
+            Up Next: {firstUpNextSong.title}
+          </Link>
+        ) : (
+          <Link to="/queue" className="sf-player-up-next sf-player-up-next-muted">
+            Queue kosong
+          </Link>
+        )}
 
         {error ? (
           <p className="sf-player-error" role="alert">

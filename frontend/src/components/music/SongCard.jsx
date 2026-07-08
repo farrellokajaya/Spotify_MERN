@@ -17,9 +17,16 @@ const getSongImage = (song) => {
   return song.coverImageUrl || song.album?.coverImageUrl || song.artist?.imageUrl || "";
 };
 
-function SongCard({ song, metaText, onFavoriteRemoved }) {
-  const { currentSong, isPlaying, isLoading, playSong, togglePlay } =
-    usePlayer();
+function SongCard({ song, songs = [], metaText, onFavoriteRemoved }) {
+  const {
+    currentSong,
+    isPlaying,
+    isLoading,
+    playSong,
+    playSongList,
+    togglePlay,
+    addToQueue,
+  } = usePlayer();
   const { isSongFavorite, isFavoritePending, toggleFavorite } = useFavorites();
 
   const isCurrentSong = currentSong?.id === song.id;
@@ -42,6 +49,11 @@ function SongCard({ song, metaText, onFavoriteRemoved }) {
   const handlePlay = () => {
     if (isCurrentSong) {
       togglePlay();
+      return;
+    }
+
+    if (songs.length > 0) {
+      playSongList(songs, song);
       return;
     }
 
@@ -76,6 +88,11 @@ function SongCard({ song, metaText, onFavoriteRemoved }) {
     } catch {
       return;
     }
+  };
+
+  const handleAddToQueue = (event) => {
+    event.stopPropagation();
+    addToQueue(song);
   };
 
   return (
@@ -114,6 +131,15 @@ function SongCard({ song, metaText, onFavoriteRemoved }) {
           aria-pressed={isFavorite}
         >
           {favoritePending ? "…" : "♥"}
+        </button>
+
+        <button
+          type="button"
+          className="sf-add-queue-button"
+          onClick={handleAddToQueue}
+          aria-label={`Add ${song.title} to queue`}
+        >
+          ⇥
         </button>
 
         <button

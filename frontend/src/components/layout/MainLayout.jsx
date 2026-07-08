@@ -33,6 +33,11 @@ const pageMeta = {
     title: "Your playlists",
     subtitle: "Kelola playlist pribadi dan kumpulan lagu pilihan kamu.",
   },
+  "/queue": {
+  eyebrow: "Queue",
+  title: "Next up",
+  subtitle: "Atur daftar lagu yang sedang dan akan diputar berikutnya.",
+},
 };
 
 const getPageMeta = (pathname) => {

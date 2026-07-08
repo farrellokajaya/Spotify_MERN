@@ -26,6 +26,11 @@ const baseMenu = [
     path: "/playlists",
     icon: "+",
   },
+    {
+    label: "Queue",
+    path: "/queue",
+    icon: "≡",
+  },
 ];
 
 export default function MobileNavigation({ user }) {

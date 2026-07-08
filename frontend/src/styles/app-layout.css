@@ -1776,3 +1776,131 @@ img {
 .sf-modal-backdrop {
   isolation: isolate;
 }
+
+.sf-add-queue-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 3;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(11, 15, 14, 0.78);
+  color: var(--sf-muted-strong);
+  font-size: 1rem;
+  font-weight: 900;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.sf-add-queue-button:hover,
+.sf-add-queue-button:focus-visible {
+  border-color: rgba(30, 215, 96, 0.45);
+  background: var(--sf-accent-soft);
+  color: var(--sf-accent);
+}
+
+.sf-music-card:hover .sf-add-queue-button,
+.sf-music-card.is-active .sf-add-queue-button,
+.sf-add-queue-button:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sf-player-button.is-active {
+  border-color: rgba(30, 215, 96, 0.55);
+  background: var(--sf-accent-soft);
+  color: var(--sf-accent);
+}
+
+.sf-player-up-next {
+  overflow: hidden;
+  justify-self: center;
+  max-width: 100%;
+  color: var(--sf-muted-strong);
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sf-player-up-next:hover {
+  color: var(--sf-accent);
+}
+
+.sf-player-up-next-muted {
+  color: var(--sf-muted);
+}
+
+.sf-queue-page {
+  gap: 16px;
+}
+
+.sf-queue-list {
+  gap: 4px;
+}
+
+.sf-queue-section-title {
+  padding: 10px 12px 6px;
+  color: var(--sf-accent);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+  .sf-player-controls {
+    flex-wrap: wrap;
+  }
+}
+
+.sf-queue-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 112px;
+  z-index: 80;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 1px solid rgba(30, 215, 96, 0.35);
+  border-radius: 18px;
+  background: rgba(16, 24, 21, 0.96);
+  color: var(--sf-text);
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1.45;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  animation: sf-queue-toast-in 180ms ease both;
+}
+
+@keyframes sf-queue-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 720px) {
+  .sf-queue-toast {
+    right: 16px;
+    bottom: 148px;
+    left: 16px;
+    max-width: none;
+  }
+}

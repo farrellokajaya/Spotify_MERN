@@ -115,7 +115,7 @@ function HomePage() {
             emptyMessage="Belum ada lagu published."
           >
             {musicData.songs.map((song) => (
-              <SongCard key={song.id} song={song} />
+              <SongCard key={song.id} song={song} songs={musicData.songs} />
             ))}
           </MusicSection>
 

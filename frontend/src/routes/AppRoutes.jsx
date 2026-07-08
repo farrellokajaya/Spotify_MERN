@@ -24,6 +24,7 @@ import AdminSongsPage from "../pages/admin/AdminSongsPage";
 import PlaylistDetailPage from "../pages/PlaylistDetailPage";
 import PlaylistPage from "../pages/PlaylistPage";
 import RecentlyPlayedPage from "../pages/RecentlyPlayedPage";
+import QueuePage from "../pages/QueuePage";
 
 function AppRoutes() {
   return (
@@ -43,6 +44,7 @@ function AppRoutes() {
           <Route path="/playlists" element={<PlaylistPage />} />
           <Route path="/playlists/:id" element={<PlaylistDetailPage />} />
           <Route path="/recently-played" element={<RecentlyPlayedPage />} />
+          <Route path="/queue" element={<QueuePage />} />
         </Route>
       </Route>
 
