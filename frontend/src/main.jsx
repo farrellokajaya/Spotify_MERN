@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router";
 
 import App from "./App.jsx";
 import AuthProvider from "./contexts/AuthProvider";
+import FavoriteProvider from "./contexts/FavoriteProvider";
 import PlayerProvider from "./contexts/PlayerProvider";
 import "./index.css";
 import "./styles/app-layout.css";
@@ -13,9 +14,11 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <PlayerProvider>
-          <App />
-        </PlayerProvider>
+        <FavoriteProvider>
+          <PlayerProvider>
+            <App />
+          </PlayerProvider>
+        </FavoriteProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

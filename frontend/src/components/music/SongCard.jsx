@@ -1,3 +1,4 @@
+import useFavorites from "../../hooks/useFavorites";
 import usePlayer from "../../hooks/usePlayer";
 
 const formatDuration = (seconds) => {
@@ -12,13 +13,16 @@ const formatDuration = (seconds) => {
 };
 
 const getSongImage = (song) => {
-  return song.coverImageUrl || song.artist?.imageUrl || "";
+  return song.coverImageUrl || song.album?.coverImageUrl || song.artist?.imageUrl || "";
 };
 
-function SongCard({ song }) {
+function SongCard({ song, onFavoriteRemoved }) {
   const { currentSong, isPlaying, isLoading, playSong, togglePlay } =
     usePlayer();
+  const { isSongFavorite, isFavoritePending, toggleFavorite } = useFavorites();
   const isCurrentSong = currentSong?.id === song.id;
+  const isFavorite = isSongFavorite(song.id);
+  const favoritePending = isFavoritePending(song.id);
   const songImage = getSongImage(song);
 
   const getButtonText = () => {
@@ -42,6 +46,20 @@ function SongCard({ song }) {
     playSong(song);
   };
 
+  const handleFavorite = async () => {
+    try {
+      const wasFavorite = isFavorite;
+
+      await toggleFavorite(song);
+
+      if (wasFavorite && onFavoriteRemoved) {
+        onFavoriteRemoved(song.id);
+      }
+    } catch {
+      // Error ditangani oleh FavoriteProvider agar UI tetap aman.
+    }
+  };
+
   return (
     <article className={`sf-music-card ${isCurrentSong ? "is-active" : ""}`}>
       <div className="sf-music-cover-wrap">
@@ -57,6 +75,17 @@ function SongCard({ song }) {
             {song.title.charAt(0).toUpperCase()}
           </span>
         )}
+
+        <button
+          type="button"
+          className={`sf-favorite-button ${isFavorite ? "is-liked" : ""}`}
+          onClick={handleFavorite}
+          disabled={favoritePending}
+          aria-label={`${isFavorite ? "Remove from" : "Add to"} favorite songs`}
+          aria-pressed={isFavorite}
+        >
+          {favoritePending ? "…" : "♥"}
+        </button>
 
         <button
           type="button"

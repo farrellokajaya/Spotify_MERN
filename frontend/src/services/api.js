@@ -182,3 +182,29 @@ export const getPublicArtistDetail = (identifier) => {
 export const getPublicAlbumDetail = (identifier) => {
   return apiRequest(`/api/music/albums/${identifier}`);
 };
+
+export const getFavoriteSongs = (token) => {
+  return apiRequest("/api/library/favorites", {
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const addFavoriteSong = (token, songId) => {
+  return apiRequest(`/api/library/favorites/${songId}`, {
+    method: "POST",
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const removeFavoriteSong = (token, songId) => {
+  return apiRequest(`/api/library/favorites/${songId}`, {
+    method: "DELETE",
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const checkFavoriteSong = (token, songId) => {
+  return apiRequest(`/api/library/favorites/check/${songId}`, {
+    headers: createAuthHeaders(token),
+  });
+};

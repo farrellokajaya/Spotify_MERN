@@ -5,6 +5,7 @@ import morgan from "morgan";
 import adminRouter from "./routes/admin.route.js";
 import authRouter from "./routes/auth.route.js";
 import healthRouter from "./routes/health.route.js";
+import libraryRouter from "./routes/library.route.js";
 import musicRouter from "./routes/music.route.js";
 
 const app = express();
@@ -31,6 +32,7 @@ app.use("/api/health", healthRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/music", musicRouter);
+app.use("/api/library", libraryRouter);
 
 app.use((req, res) => {
   res.status(404).json({
