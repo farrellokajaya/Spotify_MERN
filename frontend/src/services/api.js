@@ -208,3 +208,52 @@ export const checkFavoriteSong = (token, songId) => {
     headers: createAuthHeaders(token),
   });
 };
+
+export const getUserPlaylists = (token) => {
+  return apiRequest("/api/playlists", {
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const getPlaylistDetail = (token, playlistId) => {
+  return apiRequest(`/api/playlists/${playlistId}`, {
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const createPlaylist = (token, payload) => {
+  return apiRequest("/api/playlists", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: JSON.stringify(payload),
+  });
+};
+
+export const updatePlaylist = (token, playlistId, payload) => {
+  return apiRequest(`/api/playlists/${playlistId}`, {
+    method: "PUT",
+    headers: createAuthHeaders(token),
+    body: JSON.stringify(payload),
+  });
+};
+
+export const deletePlaylist = (token, playlistId) => {
+  return apiRequest(`/api/playlists/${playlistId}`, {
+    method: "DELETE",
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const addSongToPlaylist = (token, playlistId, songId) => {
+  return apiRequest(`/api/playlists/${playlistId}/songs/${songId}`, {
+    method: "POST",
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const removeSongFromPlaylist = (token, playlistId, songId) => {
+  return apiRequest(`/api/playlists/${playlistId}/songs/${songId}`, {
+    method: "DELETE",
+    headers: createAuthHeaders(token),
+  });
+};

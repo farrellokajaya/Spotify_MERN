@@ -7,6 +7,7 @@ import authRouter from "./routes/auth.route.js";
 import healthRouter from "./routes/health.route.js";
 import libraryRouter from "./routes/library.route.js";
 import musicRouter from "./routes/music.route.js";
+import playlistRouter from "./routes/playlist.route.js";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/music", musicRouter);
 app.use("/api/library", libraryRouter);
+app.use("/api/playlists", playlistRouter);
 
 app.use((req, res) => {
   res.status(404).json({

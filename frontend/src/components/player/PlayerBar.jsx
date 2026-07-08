@@ -18,6 +18,7 @@ const getSongImage = (song) => {
   return (
     song?.imageUrl ||
     song?.coverImageUrl ||
+    song?.album?.coverImageUrl ||
     song?.album?.imageUrl ||
     song?.artist?.imageUrl ||
     ""
@@ -44,14 +45,8 @@ function PlayerBar() {
   const songImage = getSongImage(currentSong);
   const progressValue = duration > 0 ? Math.min(currentTime, duration) : 0;
   const canSeek = duration > 0 && !isLoading && !error;
+  const buttonText = isLoading ? "…" : isPlaying ? "Ⅱ" : "▶";
   const buttonLabel = isLoading ? "Loading" : isPlaying ? "Pause" : "Play";
-  const statusText = error
-    ? "Playback error"
-    : isLoading
-      ? "Loading audio"
-      : isPlaying
-        ? "Playing"
-        : "Paused";
 
   return (
     <aside className="sf-player-bar" aria-label="Now playing">
@@ -74,20 +69,14 @@ function PlayerBar() {
       </div>
 
       <div className="sf-player-center">
-        <div className="sf-player-controls">
-          <button
-            type="button"
-            className="sf-player-button primary"
-            onClick={togglePlay}
-            aria-label={isPlaying ? "Pause current song" : "Play current song"}
-          >
-            {buttonLabel}
-          </button>
-
-          <span className="sf-player-status" aria-live="polite">
-            {statusText}
-          </span>
-        </div>
+        <button
+          type="button"
+          className="sf-player-main-button"
+          onClick={togglePlay}
+          aria-label={`${buttonLabel} current song`}
+        >
+          {buttonText}
+        </button>
 
         <div className="sf-player-progress-row">
           <span className="sf-player-time">{formatTime(currentTime)}</span>
@@ -116,11 +105,11 @@ function PlayerBar() {
 
       <button
         type="button"
-        className="sf-player-button sf-player-close"
+        className="sf-player-close-button"
         onClick={clearPlayer}
         aria-label="Close player and stop audio"
       >
-        Close
+        ×
       </button>
     </aside>
   );

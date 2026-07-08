@@ -21,8 +21,12 @@ const pageMeta = {
   "/library": {
     eyebrow: "Library",
     title: "Your library",
-    subtitle:
-      "Halaman library sementara. Nanti akan berisi lagu favorit, playlist, dan histori pengguna.",
+    subtitle: "Lagu favorite yang kamu simpan di Soundify.",
+  },
+  "/playlists": {
+    eyebrow: "Playlists",
+    title: "Your playlists",
+    subtitle: "Kelola playlist pribadi dan kumpulan lagu pilihan kamu.",
   },
 };
 
@@ -32,6 +36,14 @@ const getPageMeta = (pathname) => {
       eyebrow: "Artist Detail",
       title: "Explore artist",
       subtitle: "Lihat album dan lagu published dari artist pilihan.",
+    };
+  }
+
+  if (pathname.startsWith("/playlists/")) {
+    return {
+      eyebrow: "Playlist Detail",
+      title: "Playlist songs",
+      subtitle: "Putar dan kelola lagu di playlist pilihan kamu.",
     };
   }
 

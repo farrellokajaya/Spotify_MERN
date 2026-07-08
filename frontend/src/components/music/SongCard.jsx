@@ -1,3 +1,4 @@
+import AddToPlaylistButton from "./AddToPlaylistButton";
 import useFavorites from "../../hooks/useFavorites";
 import usePlayer from "../../hooks/usePlayer";
 
@@ -20,6 +21,7 @@ function SongCard({ song, onFavoriteRemoved }) {
   const { currentSong, isPlaying, isLoading, playSong, togglePlay } =
     usePlayer();
   const { isSongFavorite, isFavoritePending, toggleFavorite } = useFavorites();
+
   const isCurrentSong = currentSong?.id === song.id;
   const isFavorite = isSongFavorite(song.id);
   const favoritePending = isFavoritePending(song.id);
@@ -46,7 +48,23 @@ function SongCard({ song, onFavoriteRemoved }) {
     playSong(song);
   };
 
-  const handleFavorite = async () => {
+  const handleCardKeyDown = (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    handlePlay();
+  };
+
+  const handlePlayButton = (event) => {
+    event.stopPropagation();
+    handlePlay();
+  };
+
+  const handleFavorite = async (event) => {
+    event.stopPropagation();
+
     try {
       const wasFavorite = isFavorite;
 
@@ -56,12 +74,21 @@ function SongCard({ song, onFavoriteRemoved }) {
         onFavoriteRemoved(song.id);
       }
     } catch {
-      // Error ditangani oleh FavoriteProvider agar UI tetap aman.
+      return;
     }
   };
 
   return (
-    <article className={`sf-music-card ${isCurrentSong ? "is-active" : ""}`}>
+    <article
+      className={`sf-music-card sf-music-card-clickable ${
+        isCurrentSong ? "is-active" : ""
+      }`}
+      onClick={handlePlay}
+      onKeyDown={handleCardKeyDown}
+      role="button"
+      tabIndex="0"
+      aria-label={`${isCurrentSong && isPlaying ? "Pause" : "Play"} ${song.title}`}
+    >
       <div className="sf-music-cover-wrap">
         {songImage ? (
           <img
@@ -75,6 +102,8 @@ function SongCard({ song, onFavoriteRemoved }) {
             {song.title.charAt(0).toUpperCase()}
           </span>
         )}
+
+        <AddToPlaylistButton song={song} />
 
         <button
           type="button"
@@ -90,7 +119,7 @@ function SongCard({ song, onFavoriteRemoved }) {
         <button
           type="button"
           className="sf-play-button"
-          onClick={handlePlay}
+          onClick={handlePlayButton}
           aria-label={`${isCurrentSong && isPlaying ? "Pause" : "Play"} ${song.title}`}
           aria-pressed={isCurrentSong && isPlaying}
         >

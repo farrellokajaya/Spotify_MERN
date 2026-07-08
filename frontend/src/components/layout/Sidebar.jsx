@@ -16,6 +16,11 @@ const baseMenu = [
     path: "/library",
     icon: "▦",
   },
+  {
+    label: "Playlists",
+    path: "/playlists",
+    icon: "+",
+  },
 ];
 
 export default function Sidebar({ user }) {

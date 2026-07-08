@@ -21,6 +21,9 @@ import AdminArtistsPage from "../pages/admin/AdminArtistsPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminSongsPage from "../pages/admin/AdminSongsPage";
 
+import PlaylistDetailPage from "../pages/PlaylistDetailPage";
+import PlaylistPage from "../pages/PlaylistPage";
+
 function AppRoutes() {
   return (
     <Routes>
@@ -36,6 +39,8 @@ function AppRoutes() {
           <Route path="/artists/:id" element={<ArtistDetailPage />} />
           <Route path="/albums/:id" element={<AlbumDetailPage />} />
           <Route path="/library" element={<LibraryPage />} />
+          <Route path="/playlists" element={<PlaylistPage />} />
+          <Route path="/playlists/:id" element={<PlaylistDetailPage />} />
         </Route>
       </Route>
 
