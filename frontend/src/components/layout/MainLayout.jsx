@@ -23,6 +23,11 @@ const pageMeta = {
     title: "Your library",
     subtitle: "Lagu favorite yang kamu simpan di Soundify.",
   },
+  "/recently-played": {
+  eyebrow: "Recently Played",
+  title: "Your listening history",
+  subtitle: "Lihat lagu yang terakhir kamu putar di Soundify.",
+  },
   "/playlists": {
     eyebrow: "Playlists",
     title: "Your playlists",

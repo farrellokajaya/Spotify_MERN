@@ -7,6 +7,8 @@ import {
 } from "react";
 
 import PlayerContext from "./PlayerContext";
+import useAuth from "../hooks/useAuth";
+import { recordSongPlay } from "../services/api";
 
 const getAudioUrl = (song) => song?.audioUrl?.trim() || "";
 
@@ -38,6 +40,8 @@ function PlayerProvider({ children }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState("");
+  const { token, isAuthenticated } = useAuth();
+  const lastRecordedSongIdRef = useRef("");
 
   const pauseAudioElement = useCallback(() => {
     const audio = audioRef.current;
@@ -58,24 +62,49 @@ function PlayerProvider({ children }) {
     }
   }, []);
 
-  const playSong = useCallback((song) => {
-    const audioUrl = getAudioUrl(song);
+  const recordPlaySafely = useCallback((song) => {
+    const songId = getSongId(song);
 
-    setCurrentSong(song);
-    setCurrentTime(0);
-    setDuration(getFallbackDuration(song));
-    setError("");
-    setIsLoading(Boolean(audioUrl));
-
-    if (!audioUrl) {
-      setIsPlaying(false);
-      setIsLoading(false);
-      setError("Audio lagu belum tersedia atau audioUrl masih kosong.");
+    if (!isAuthenticated || !token || !songId) {
       return;
     }
 
-    setIsPlaying(true);
-  }, []);
+    if (lastRecordedSongIdRef.current === songId) {
+      return;
+    }
+
+    lastRecordedSongIdRef.current = songId;
+
+    recordSongPlay(token, songId).catch(() => {
+      if (lastRecordedSongIdRef.current === songId) {
+        lastRecordedSongIdRef.current = "";
+      }
+    });
+    },[isAuthenticated, token],
+  );
+
+  const playSong = useCallback(
+    (song) => {
+      const audioUrl = getAudioUrl(song);
+
+      setCurrentSong(song);
+      setCurrentTime(0);
+      setDuration(getFallbackDuration(song));
+      setError("");
+      setIsLoading(Boolean(audioUrl));
+
+      if (!audioUrl) {
+        setIsPlaying(false);
+        setIsLoading(false);
+        setError("Audio lagu belum tersedia atau audioUrl masih kosong.");
+        return;
+      }
+
+      recordPlaySafely(song);
+      setIsPlaying(true);
+    },
+    [recordPlaySafely],
+  );
 
   const pauseSong = useCallback(() => {
     pauseAudioElement();

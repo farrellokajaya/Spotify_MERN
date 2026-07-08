@@ -257,3 +257,23 @@ export const removeSongFromPlaylist = (token, playlistId, songId) => {
     headers: createAuthHeaders(token),
   });
 };
+
+export const getRecentlyPlayed = (token) => {
+  return apiRequest("/api/history/recent", {
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const recordSongPlay = (token, songId) => {
+  return apiRequest(`/api/history/songs/${songId}`, {
+    method: "POST",
+    headers: createAuthHeaders(token),
+  });
+};
+
+export const clearRecentlyPlayed = (token) => {
+  return apiRequest("/api/history/clear", {
+    method: "DELETE",
+    headers: createAuthHeaders(token),
+  });
+};

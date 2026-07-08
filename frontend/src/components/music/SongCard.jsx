@@ -17,7 +17,7 @@ const getSongImage = (song) => {
   return song.coverImageUrl || song.album?.coverImageUrl || song.artist?.imageUrl || "";
 };
 
-function SongCard({ song, onFavoriteRemoved }) {
+function SongCard({ song, metaText, onFavoriteRemoved }) {
   const { currentSong, isPlaying, isLoading, playSong, togglePlay } =
     usePlayer();
   const { isSongFavorite, isFavoritePending, toggleFavorite } = useFavorites();
@@ -133,7 +133,7 @@ function SongCard({ song, onFavoriteRemoved }) {
           {song.artist?.name || "Unknown artist"}
           {song.album?.title ? ` • ${song.album.title}` : ""}
         </p>
-        <span>{formatDuration(song.durationSeconds)}</span>
+        <span>{metaText || formatDuration(song.durationSeconds)}</span>
       </div>
     </article>
   );

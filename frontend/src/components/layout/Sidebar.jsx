@@ -17,6 +17,11 @@ const baseMenu = [
     icon: "▦",
   },
   {
+  label: "Recent",
+  path: "/recently-played",
+  icon: "◴",
+  },
+  {
     label: "Playlists",
     path: "/playlists",
     icon: "+",
