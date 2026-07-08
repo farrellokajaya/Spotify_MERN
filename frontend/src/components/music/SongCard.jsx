@@ -1,21 +1,10 @@
+import { Heart, ListPlus, Loader2, Pause, Play } from "lucide-react";
+
 import AddToPlaylistButton from "./AddToPlaylistButton";
 import useFavorites from "../../hooks/useFavorites";
 import usePlayer from "../../hooks/usePlayer";
-
-const formatDuration = (seconds) => {
-  if (!seconds) {
-    return "-";
-  }
-
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-
-  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
-};
-
-const getSongImage = (song) => {
-  return song.coverImageUrl || song.album?.coverImageUrl || song.artist?.imageUrl || "";
-};
+import { formatDuration } from "../../utils/format";
+import { getSongImage } from "../../utils/song";
 
 function SongCard({ song, songs = [], metaText, onFavoriteRemoved }) {
   const {
@@ -33,18 +22,6 @@ function SongCard({ song, songs = [], metaText, onFavoriteRemoved }) {
   const isFavorite = isSongFavorite(song.id);
   const favoritePending = isFavoritePending(song.id);
   const songImage = getSongImage(song);
-
-  const getButtonText = () => {
-    if (isCurrentSong && isLoading) {
-      return "…";
-    }
-
-    if (isCurrentSong && isPlaying) {
-      return "Ⅱ";
-    }
-
-    return "▶";
-  };
 
   const handlePlay = () => {
     if (isCurrentSong) {
@@ -95,6 +72,18 @@ function SongCard({ song, songs = [], metaText, onFavoriteRemoved }) {
     addToQueue(song);
   };
 
+  const renderPlayIcon = () => {
+    if (isCurrentSong && isLoading) {
+      return <Loader2 size={17} className="sf-spin-icon" aria-hidden="true" />;
+    }
+
+    if (isCurrentSong && isPlaying) {
+      return <Pause size={17} fill="currentColor" aria-hidden="true" />;
+    }
+
+    return <Play size={18} fill="currentColor" aria-hidden="true" />;
+  };
+
   return (
     <article
       className={`sf-music-card sf-music-card-clickable ${
@@ -130,7 +119,15 @@ function SongCard({ song, songs = [], metaText, onFavoriteRemoved }) {
           aria-label={`${isFavorite ? "Remove from" : "Add to"} favorite songs`}
           aria-pressed={isFavorite}
         >
-          {favoritePending ? "…" : "♥"}
+          {favoritePending ? (
+            <Loader2 size={16} className="sf-spin-icon" aria-hidden="true" />
+          ) : (
+            <Heart
+              size={16}
+              fill={isFavorite ? "currentColor" : "none"}
+              aria-hidden="true"
+            />
+          )}
         </button>
 
         <button
@@ -139,7 +136,7 @@ function SongCard({ song, songs = [], metaText, onFavoriteRemoved }) {
           onClick={handleAddToQueue}
           aria-label={`Add ${song.title} to queue`}
         >
-          ⇥
+          <ListPlus size={16} aria-hidden="true" />
         </button>
 
         <button
@@ -149,7 +146,7 @@ function SongCard({ song, songs = [], metaText, onFavoriteRemoved }) {
           aria-label={`${isCurrentSong && isPlaying ? "Pause" : "Play"} ${song.title}`}
           aria-pressed={isCurrentSong && isPlaying}
         >
-          {getButtonText()}
+          {renderPlayIcon()}
         </button>
       </div>
 

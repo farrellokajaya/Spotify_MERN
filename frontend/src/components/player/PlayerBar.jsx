@@ -1,31 +1,18 @@
+import {
+  Loader2,
+  Pause,
+  Play,
+  Repeat,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  X,
+} from "lucide-react";
 import { Link } from "react-router";
 
 import usePlayer from "../../hooks/usePlayer";
-
-const formatTime = (seconds) => {
-  const safeSeconds = Number(seconds);
-
-  if (!Number.isFinite(safeSeconds) || safeSeconds <= 0) {
-    return "0:00";
-  }
-
-  const roundedSeconds = Math.floor(safeSeconds);
-  const minutes = Math.floor(roundedSeconds / 60);
-  const remainingSeconds = roundedSeconds % 60;
-
-  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
-};
-
-const getSongImage = (song) => {
-  return (
-    song?.imageUrl ||
-    song?.coverImageUrl ||
-    song?.album?.coverImageUrl ||
-    song?.album?.imageUrl ||
-    song?.artist?.imageUrl ||
-    ""
-  );
-};
+import { formatTime } from "../../utils/format";
+import { getSongImage } from "../../utils/song";
 
 function PlayerBar() {
   const {
@@ -54,9 +41,20 @@ function PlayerBar() {
   const songImage = getSongImage(currentSong);
   const progressValue = duration > 0 ? Math.min(currentTime, duration) : 0;
   const canSeek = duration > 0 && !isLoading && !error;
-  const buttonText = isLoading ? "…" : isPlaying ? "Ⅱ" : "▶";
   const buttonLabel = isLoading ? "Loading" : isPlaying ? "Pause" : "Play";
   const firstUpNextSong = upNextSongs[0];
+
+  const renderMainButtonIcon = () => {
+    if (isLoading) {
+      return <Loader2 size={21} className="sf-spin-icon" aria-hidden="true" />;
+    }
+
+    if (isPlaying) {
+      return <Pause size={21} fill="currentColor" aria-hidden="true" />;
+    }
+
+    return <Play size={22} fill="currentColor" aria-hidden="true" />;
+  };
 
   return (
     <aside className="sf-player-bar" aria-label="Now playing">
@@ -82,21 +80,21 @@ function PlayerBar() {
         <div className="sf-player-controls">
           <button
             type="button"
-            className={`sf-player-button ${isShuffle ? "is-active" : ""}`}
+            className={`sf-player-button sf-player-icon-button ${isShuffle ? "is-active" : ""}`}
             onClick={toggleShuffle}
             aria-label={`${isShuffle ? "Disable" : "Enable"} shuffle`}
             aria-pressed={isShuffle}
           >
-            Shuffle
+            <Shuffle size={17} aria-hidden="true" />
           </button>
 
           <button
             type="button"
-            className="sf-player-button"
+            className="sf-player-button sf-player-icon-button"
             onClick={playPrevious}
             aria-label="Play previous song"
           >
-            ‹‹
+            <SkipBack size={18} fill="currentColor" aria-hidden="true" />
           </button>
 
           <button
@@ -105,26 +103,26 @@ function PlayerBar() {
             onClick={togglePlay}
             aria-label={`${buttonLabel} current song`}
           >
-            {buttonText}
+            {renderMainButtonIcon()}
           </button>
 
           <button
             type="button"
-            className="sf-player-button"
+            className="sf-player-button sf-player-icon-button"
             onClick={playNext}
             aria-label="Play next song"
           >
-            ››
+            <SkipForward size={18} fill="currentColor" aria-hidden="true" />
           </button>
 
           <button
             type="button"
-            className={`sf-player-button ${isRepeat ? "is-active" : ""}`}
+            className={`sf-player-button sf-player-icon-button ${isRepeat ? "is-active" : ""}`}
             onClick={toggleRepeat}
             aria-label={`${isRepeat ? "Disable" : "Enable"} repeat queue`}
             aria-pressed={isRepeat}
           >
-            Repeat
+            <Repeat size={17} aria-hidden="true" />
           </button>
         </div>
 
@@ -169,7 +167,7 @@ function PlayerBar() {
         onClick={clearPlayer}
         aria-label="Close player and stop audio"
       >
-        ×
+        <X size={18} aria-hidden="true" />
       </button>
     </aside>
   );

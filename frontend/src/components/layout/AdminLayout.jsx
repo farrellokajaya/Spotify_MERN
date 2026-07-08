@@ -1,4 +1,12 @@
 import {
+  ArrowLeft,
+  Disc3,
+  LayoutDashboard,
+  Music,
+  UserRound,
+} from "lucide-react";
+
+import {
   Link,
   NavLink,
   Outlet,
@@ -10,22 +18,22 @@ const adminMenu = [
   {
     label: "Dashboard",
     path: "/admin",
-    icon: "▣",
+    icon: LayoutDashboard,
   },
   {
     label: "Artists",
     path: "/admin/artists",
-    icon: "♪",
+    icon: UserRound,
   },
   {
     label: "Albums",
     path: "/admin/albums",
-    icon: "▤",
+    icon: Disc3,
   },
   {
     label: "Songs",
     path: "/admin/songs",
-    icon: "♫",
+    icon: Music,
   },
 ];
 
@@ -52,28 +60,30 @@ function AdminLayout() {
           </div>
 
           <nav className="sf-admin-nav">
-            {adminMenu.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === "/admin"}
-                className={({ isActive }) =>
-                  isActive
-                    ? "sf-nav-link active"
-                    : "sf-nav-link"
-                }
-              >
-                <span className="sf-nav-icon" aria-hidden="true">
-                  {item.icon}
-                </span>
+            {adminMenu.map((item) => {
+              const Icon = item.icon;
 
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.path === "/admin"}
+                  className={({ isActive }) =>
+                    isActive ? "sf-nav-link active" : "sf-nav-link"
+                  }
+                >
+                  <span className="sf-nav-icon" aria-hidden="true">
+                    <Icon size={19} strokeWidth={2.2} />
+                  </span>
+
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
 
             <Link to="/" className="sf-nav-link">
               <span className="sf-nav-icon" aria-hidden="true">
-                ←
+                <ArrowLeft size={19} strokeWidth={2.2} />
               </span>
 
               <span>Back to App</span>

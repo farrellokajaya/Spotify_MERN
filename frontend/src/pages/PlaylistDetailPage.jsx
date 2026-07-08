@@ -1,51 +1,26 @@
+import { ListPlus, Loader2, Pause, Play, Shuffle, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 
 import useAuth from "../hooks/useAuth";
 import usePlayer from "../hooks/usePlayer";
+import useToast from "../hooks/useToast";
 import {
   getPlaylistDetail,
   removeSongFromPlaylist,
 } from "../services/api";
+import { formatDuration } from "../utils/format";
+import { shuffleSongs } from "../utils/player";
+import { getSongImage } from "../utils/song";
 
 const initialDetail = {
   playlist: null,
 };
 
-const formatDuration = (seconds) => {
-  const safeSeconds = Number(seconds);
-
-  if (!Number.isFinite(safeSeconds) || safeSeconds <= 0) {
-    return "-";
-  }
-
-  const minutes = Math.floor(safeSeconds / 60);
-  const remainingSeconds = safeSeconds % 60;
-
-  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
-};
-
-const getSongImage = (song) => {
-  return song.coverImageUrl || song.album?.coverImageUrl || song.artist?.imageUrl || "";
-};
-
-const shuffleSongs = (songs) => {
-  const shuffledSongs = [...songs];
-
-  for (let index = shuffledSongs.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1));
-    const currentSong = shuffledSongs[index];
-
-    shuffledSongs[index] = shuffledSongs[randomIndex];
-    shuffledSongs[randomIndex] = currentSong;
-  }
-
-  return shuffledSongs;
-};
-
 function PlaylistDetailPage() {
   const { id } = useParams();
   const { token } = useAuth();
+  const toast = useToast();
   const {
     currentSong,
     isPlaying,
@@ -79,10 +54,11 @@ function PlaylistDetailPage() {
     } catch (err) {
       setError(err.message);
       setDetail(initialDetail);
+      toast.error(err.message || "Gagal memuat detail playlist.");
     } finally {
       setLoading(false);
     }
-  }, [id, token]);
+  }, [id, toast, token]);
 
   useEffect(() => {
     let ignore = false;
@@ -97,6 +73,20 @@ function PlaylistDetailPage() {
       ignore = true;
     };
   }, [loadPlaylistDetail]);
+
+  const renderPlayIcon = (song) => {
+    const isCurrentSong = currentSong?.id === song.id;
+
+    if (isCurrentSong && isLoading) {
+      return <Loader2 size={16} className="sf-spin-icon" aria-hidden="true" />;
+    }
+
+    if (isCurrentSong && isPlaying) {
+      return <Pause size={16} fill="currentColor" aria-hidden="true" />;
+    }
+
+    return <Play size={16} fill="currentColor" aria-hidden="true" />;
+  };
 
   const handlePlay = (song) => {
     if (currentSong?.id === song.id) {
@@ -135,23 +125,19 @@ function PlaylistDetailPage() {
   };
 
   const handleQueueAll = () => {
+    let addedCount = 0;
+
     songs.forEach((song) => {
-      addToQueue(song);
+      const added = addToQueue(song);
+
+      if (added) {
+        addedCount += 1;
+      }
     });
-  };
 
-  const getPlayText = (song) => {
-    const isCurrentSong = currentSong?.id === song.id;
-
-    if (isCurrentSong && isLoading) {
-      return "…";
+    if (addedCount === 0) {
+      toast.info("Semua song sudah ada di queue.");
     }
-
-    if (isCurrentSong && isPlaying) {
-      return "Pause";
-    }
-
-    return "Play";
   };
 
   const handleRemoveSong = async (song) => {
@@ -178,8 +164,11 @@ function PlaylistDetailPage() {
           },
         };
       });
+
+      toast.success(`${song.title} dihapus dari playlist.`);
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal menghapus song dari playlist.");
     } finally {
       setRemovingId("");
     }
@@ -239,29 +228,32 @@ function PlaylistDetailPage() {
           <div className="sf-button-row sf-playlist-hero-actions">
             <button
               type="button"
-              className="sf-button sf-button-primary"
+              className="sf-button sf-button-primary sf-button-with-icon"
               onClick={handlePlayAll}
               disabled={!songs.length}
             >
-              Play All
+              <Play size={16} fill="currentColor" aria-hidden="true" />
+              <span>Play All</span>
             </button>
 
             <button
               type="button"
-              className="sf-button sf-button-secondary"
+              className="sf-button sf-button-secondary sf-button-with-icon"
               onClick={handleShufflePlay}
               disabled={!songs.length}
             >
-              Shuffle Play
+              <Shuffle size={16} aria-hidden="true" />
+              <span>Shuffle Play</span>
             </button>
 
             <button
               type="button"
-              className="sf-button sf-button-secondary"
+              className="sf-button sf-button-secondary sf-button-with-icon"
               onClick={handleQueueAll}
               disabled={!songs.length}
             >
-              Queue All
+              <ListPlus size={16} aria-hidden="true" />
+              <span>Queue All</span>
             </button>
           </div>
         </div>
@@ -276,7 +268,7 @@ function PlaylistDetailPage() {
       {songs.length === 0 ? (
         <div className="sf-empty-panel">
           Playlist ini belum memiliki song. Tambahkan lagu dari Home, Search,
-          Artist Detail, Album Detail, atau Library dengan tombol +.
+          Artist Detail, Album Detail, atau Library dengan tombol Add to playlist.
         </div>
       ) : (
         <div className="sf-content-card sf-playlist-song-list">
@@ -314,27 +306,33 @@ function PlaylistDetailPage() {
                 <div className="sf-button-row sf-playlist-song-actions">
                   <button
                     type="button"
-                    className="sf-button sf-button-primary"
+                    className="sf-button sf-button-primary sf-button-with-icon"
                     onClick={() => handlePlay(song)}
+                    aria-label={`${isCurrentSong && isPlaying ? "Pause" : "Play"} ${song.title}`}
                   >
-                    {getPlayText(song)}
+                    {renderPlayIcon(song)}
+                    <span>{isCurrentSong && isPlaying ? "Pause" : "Play"}</span>
                   </button>
 
                   <button
                     type="button"
-                    className="sf-button sf-button-secondary"
+                    className="sf-button sf-button-secondary sf-button-with-icon"
                     onClick={() => handleAddToQueue(song)}
+                    aria-label={`Add ${song.title} to queue`}
                   >
-                    Queue
+                    <ListPlus size={16} aria-hidden="true" />
+                    <span>Queue</span>
                   </button>
 
                   <button
                     type="button"
-                    className="sf-button sf-button-danger"
+                    className="sf-button sf-button-danger sf-button-with-icon"
                     onClick={() => handleRemoveSong(song)}
                     disabled={removingId === song.id}
+                    aria-label={`Remove ${song.title} from playlist`}
                   >
-                    {removingId === song.id ? "Removing..." : "Remove"}
+                    <Trash2 size={16} aria-hidden="true" />
+                    <span>{removingId === song.id ? "Removing..." : "Remove"}</span>
                   </button>
                 </div>
               </article>

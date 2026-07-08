@@ -3,23 +3,13 @@ import { useCallback, useEffect, useState } from "react";
 import MusicSection from "../components/music/MusicSection";
 import SongCard from "../components/music/SongCard";
 import useAuth from "../hooks/useAuth";
+import useToast from "../hooks/useToast";
 import { clearRecentlyPlayed, getRecentlyPlayed } from "../services/api";
-
-const formatPlayedAt = (value) => {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Waktu tidak tersedia";
-  }
-
-  return `Terakhir diputar ${new Intl.DateTimeFormat("id-ID", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date)}`;
-};
+import { formatPlayedAt } from "../utils/format";
 
 function RecentlyPlayedPage() {
   const { token, isAuthenticated } = useAuth();
+  const toast = useToast();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [clearing, setClearing] = useState(false);
@@ -43,10 +33,11 @@ function RecentlyPlayedPage() {
       setHistory(nextHistory);
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal memuat recently played.");
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, toast, token]);
 
   useEffect(() => {
     let ignore = false;
@@ -81,8 +72,10 @@ function RecentlyPlayedPage() {
 
       await clearRecentlyPlayed(token);
       setHistory([]);
+      toast.success("Recently played berhasil dibersihkan.");
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal membersihkan recently played.");
     } finally {
       setClearing(false);
     }

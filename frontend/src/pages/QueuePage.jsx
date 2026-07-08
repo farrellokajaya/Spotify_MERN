@@ -1,21 +1,8 @@
+import { Loader2, Pause, Play, Trash2 } from "lucide-react";
+
 import usePlayer from "../hooks/usePlayer";
-
-const formatDuration = (seconds) => {
-  const safeSeconds = Number(seconds);
-
-  if (!Number.isFinite(safeSeconds) || safeSeconds <= 0) {
-    return "-";
-  }
-
-  const minutes = Math.floor(safeSeconds / 60);
-  const remainingSeconds = safeSeconds % 60;
-
-  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
-};
-
-const getSongImage = (song) => {
-  return song?.coverImageUrl || song?.album?.coverImageUrl || song?.artist?.imageUrl || "";
-};
+import { formatDuration } from "../utils/format";
+import { getSongImage } from "../utils/song";
 
 function QueuePage() {
   const {
@@ -44,18 +31,18 @@ function QueuePage() {
     playSongList(queueSongs, song);
   };
 
-  const getPlayText = (song) => {
+  const renderPlayIcon = (song) => {
     const isCurrentSong = currentSong?.id === song.id;
 
     if (isCurrentSong && isLoading) {
-      return "…";
+      return <Loader2 size={16} className="sf-spin-icon" aria-hidden="true" />;
     }
 
     if (isCurrentSong && isPlaying) {
-      return "Pause";
+      return <Pause size={16} fill="currentColor" aria-hidden="true" />;
     }
 
-    return "Play";
+    return <Play size={16} fill="currentColor" aria-hidden="true" />;
   };
 
   const renderSongRow = (song, index, label) => {
@@ -92,18 +79,22 @@ function QueuePage() {
         <div className="sf-button-row sf-playlist-song-actions">
           <button
             type="button"
-            className="sf-button sf-button-primary"
+            className="sf-button sf-button-primary sf-button-with-icon"
             onClick={() => handlePlaySong(song)}
+            aria-label={`${isCurrentSong && isPlaying ? "Pause" : "Play"} ${song.title}`}
           >
-            {getPlayText(song)}
+            {renderPlayIcon(song)}
+            <span>{isCurrentSong && isPlaying ? "Pause" : "Play"}</span>
           </button>
 
           <button
             type="button"
-            className="sf-button sf-button-danger"
+            className="sf-button sf-button-danger sf-button-with-icon"
             onClick={() => removeFromQueue(song.id)}
+            aria-label={`Remove ${song.title} from queue`}
           >
-            Remove
+            <Trash2 size={16} aria-hidden="true" />
+            <span>Remove</span>
           </button>
         </div>
       </article>
@@ -142,7 +133,7 @@ function QueuePage() {
       {currentSong ? (
         <div className="sf-content-card sf-playlist-song-list sf-queue-list">
           <div className="sf-queue-section-title">Now Playing</div>
-          {renderSongRow(currentSong, 0, "▶")}
+          {renderSongRow(currentSong, 0, "Now")}
         </div>
       ) : null}
 

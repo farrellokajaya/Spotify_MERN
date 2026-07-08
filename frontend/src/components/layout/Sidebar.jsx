@@ -1,35 +1,36 @@
+import { Clock3, Home, Library, ListMusic, Plus, Search, Settings } from "lucide-react";
 import { NavLink } from "react-router";
 
 const baseMenu = [
   {
     label: "Home",
     path: "/",
-    icon: "⌂",
+    icon: Home,
   },
   {
     label: "Search",
     path: "/search",
-    icon: "⌕",
+    icon: Search,
   },
   {
     label: "Library",
     path: "/library",
-    icon: "▦",
+    icon: Library,
   },
   {
-  label: "Recent",
-  path: "/recently-played",
-  icon: "◴",
+    label: "Recent",
+    path: "/recently-played",
+    icon: Clock3,
   },
   {
     label: "Playlists",
     path: "/playlists",
-    icon: "+",
+    icon: Plus,
   },
   {
-  label: "Queue",
-  path: "/queue",
-  icon: "≡",
+    label: "Queue",
+    path: "/queue",
+    icon: ListMusic,
   },
 ];
 
@@ -40,7 +41,7 @@ export default function Sidebar({ user }) {
         {
           label: "Admin",
           path: "/admin",
-          icon: "⚙",
+          icon: Settings,
         },
       ]
     : baseMenu;
@@ -59,21 +60,25 @@ export default function Sidebar({ user }) {
       </div>
 
       <nav className="sf-sidebar-nav">
-        {menu.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            end={item.path === "/" || item.path === "/admin"}
-            className={({ isActive }) =>
-              isActive ? "sf-nav-link active" : "sf-nav-link"
-            }
-          >
-            <span className="sf-nav-icon" aria-hidden="true">
-              {item.icon}
-            </span>
-            <span>{item.label}</span>
-          </NavLink>
-        ))}
+        {menu.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.path === "/" || item.path === "/admin"}
+              className={({ isActive }) =>
+                isActive ? "sf-nav-link active" : "sf-nav-link"
+              }
+            >
+              <span className="sf-nav-icon" aria-hidden="true">
+                <Icon size={19} strokeWidth={2.2} />
+              </span>
+              <span>{item.label}</span>
+            </NavLink>
+          );
+        })}
       </nav>
     </aside>
   );

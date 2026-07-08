@@ -1,7 +1,9 @@
+import { Pencil, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import useAuth from "../hooks/useAuth";
+import useToast from "../hooks/useToast";
 import {
   createPlaylist,
   deletePlaylist,
@@ -16,6 +18,7 @@ const initialForm = {
 
 function PlaylistPage() {
   const { token } = useAuth();
+  const toast = useToast();
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -38,10 +41,11 @@ function PlaylistPage() {
       setPlaylists(response.data?.playlists || []);
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal memuat playlist.");
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [toast, token]);
 
   useEffect(() => {
     let ignore = false;
@@ -84,8 +88,10 @@ function PlaylistPage() {
       ]);
 
       setForm(initialForm);
+      toast.success("Playlist berhasil dibuat.");
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal membuat playlist.");
     } finally {
       setSubmitting(false);
     }
@@ -121,8 +127,10 @@ function PlaylistPage() {
       );
 
       cancelEdit();
+      toast.success("Playlist berhasil diperbarui.");
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal memperbarui playlist.");
     } finally {
       setSubmitting(false);
     }
@@ -148,8 +156,11 @@ function PlaylistPage() {
           return currentPlaylist.id !== playlist.id;
         }),
       );
+
+      toast.success("Playlist berhasil dihapus.");
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal menghapus playlist.");
     } finally {
       setSubmitting(false);
     }
@@ -269,8 +280,11 @@ function PlaylistPage() {
                 </div>
               ) : (
                 <>
-                  <Link to={`/playlists/${playlist.id}`} className="sf-playlist-list-link">
-                    <span className="sf-playlist-cover">
+                  <Link
+                    to={`/playlists/${playlist.id}`}
+                    className="sf-playlist-list-link"
+                  >
+                    <span className="sf-playlist-list-cover">
                       {playlist.name.charAt(0).toUpperCase()}
                     </span>
 
@@ -284,20 +298,22 @@ function PlaylistPage() {
                   <div className="sf-button-row sf-playlist-list-actions">
                     <button
                       type="button"
-                      className="sf-button sf-button-secondary"
+                      className="sf-button sf-button-secondary sf-button-with-icon"
                       onClick={() => startEdit(playlist)}
                       disabled={submitting}
                     >
-                      Edit
+                      <Pencil size={16} aria-hidden="true" />
+                      <span>Edit</span>
                     </button>
 
                     <button
                       type="button"
-                      className="sf-button sf-button-danger"
+                      className="sf-button sf-button-danger sf-button-with-icon"
                       onClick={() => handleDelete(playlist)}
                       disabled={submitting}
                     >
-                      Delete
+                      <Trash2 size={16} aria-hidden="true" />
+                      <span>Delete</span>
                     </button>
                   </div>
                 </>

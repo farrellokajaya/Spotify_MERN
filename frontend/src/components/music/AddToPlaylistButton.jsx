@@ -1,18 +1,20 @@
+import { ListPlus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router";
 
 import useAuth from "../../hooks/useAuth";
+import useToast from "../../hooks/useToast";
 import { addSongToPlaylist, getUserPlaylists } from "../../services/api";
 
 function AddToPlaylistButton({ song }) {
   const { token } = useAuth();
+  const toast = useToast();
   const [open, setOpen] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submittingId, setSubmittingId] = useState("");
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     let ignore = false;
@@ -27,7 +29,6 @@ function AddToPlaylistButton({ song }) {
       try {
         setLoading(true);
         setError("");
-        setSuccessMessage("");
 
         const response = await getUserPlaylists(token);
 
@@ -37,6 +38,7 @@ function AddToPlaylistButton({ song }) {
       } catch (err) {
         if (!ignore) {
           setError(err.message);
+          toast.error(err.message || "Gagal memuat playlist.");
         }
       } finally {
         if (!ignore) {
@@ -50,7 +52,7 @@ function AddToPlaylistButton({ song }) {
     return () => {
       ignore = true;
     };
-  }, [open, token]);
+  }, [open, toast, token]);
 
   useEffect(() => {
     if (!open) {
@@ -75,6 +77,7 @@ function AddToPlaylistButton({ song }) {
   const handleOpen = (event) => {
     event.stopPropagation();
     setOpen(true);
+    setError("");
   };
 
   const handleClose = (event) => {
@@ -84,24 +87,25 @@ function AddToPlaylistButton({ song }) {
 
     setOpen(false);
     setError("");
-    setSuccessMessage("");
   };
 
   const handleAddToPlaylist = async (playlistId) => {
     if (!token || !song?.id) {
+      toast.error("Song tidak valid dan gagal ditambahkan ke playlist.");
       return;
     }
 
     try {
       setSubmittingId(playlistId);
       setError("");
-      setSuccessMessage("");
 
       await addSongToPlaylist(token, playlistId, song.id);
 
-      setSuccessMessage("Song berhasil ditambahkan ke playlist.");
+      toast.success(`${song.title} berhasil ditambahkan ke playlist.`);
+      setOpen(false);
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal menambahkan song ke playlist.");
     } finally {
       setSubmittingId("");
     }
@@ -133,19 +137,13 @@ function AddToPlaylistButton({ song }) {
             onClick={handleClose}
             aria-label="Close playlist modal"
           >
-            ×
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
         {error ? (
           <div className="sf-alert sf-alert-error" role="alert">
             {error}
-          </div>
-        ) : null}
-
-        {successMessage ? (
-          <div className="sf-alert sf-alert-success" role="status">
-            {successMessage}
           </div>
         ) : null}
 
@@ -194,7 +192,7 @@ function AddToPlaylistButton({ song }) {
         onClick={handleOpen}
         aria-label={`Add ${song.title} to playlist`}
       >
-        +
+        <ListPlus size={16} aria-hidden="true" />
       </button>
 
       {modal ? createPortal(modal, document.body) : null}

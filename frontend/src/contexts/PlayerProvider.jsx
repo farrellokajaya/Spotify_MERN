@@ -8,63 +8,24 @@ import {
 
 import PlayerContext from "./PlayerContext";
 import useAuth from "../hooks/useAuth";
+import useToast from "../hooks/useToast";
 import { recordSongPlay } from "../services/api";
-
-const getAudioUrl = (song) => song?.audioUrl?.trim() || "";
-
-const getSongId = (song) => String(song?.id || song?._id || "");
-
-const getFallbackDuration = (song) => {
-  const durationSeconds = Number(song?.durationSeconds);
-
-  if (!Number.isFinite(durationSeconds) || durationSeconds < 0) {
-    return 0;
-  }
-
-  return durationSeconds;
-};
-
-const getSafeTime = (time) => {
-  if (!Number.isFinite(time) || time < 0) {
-    return 0;
-  }
-
-  return time;
-};
-
-const buildUniqueSongs = (songs = []) => {
-  const songMap = new Map();
-
-  songs.forEach((song) => {
-    const songId = getSongId(song);
-
-    if (songId && !songMap.has(songId)) {
-      songMap.set(songId, song);
-    }
-  });
-
-  return Array.from(songMap.values());
-};
-
-const getRandomIndex = (totalSongs, currentIndex) => {
-  if (totalSongs <= 1) {
-    return currentIndex;
-  }
-
-  let nextIndex = currentIndex;
-
-  while (nextIndex === currentIndex) {
-    nextIndex = Math.floor(Math.random() * totalSongs);
-  }
-
-  return nextIndex;
-};
+import {
+  buildUniqueSongs,
+  getRandomIndex,
+  getSafeTime,
+} from "../utils/player";
+import {
+  getAudioUrl,
+  getFallbackDuration,
+  getSongId,
+} from "../utils/song";
 
 function PlayerProvider({ children }) {
   const audioRef = useRef(null);
   const lastRecordedSongIdRef = useRef("");
-  const queueNoticeTimerRef = useRef(null);
   const { token, isAuthenticated } = useAuth();
+  const toast = useToast();
 
   const [currentSong, setCurrentSong] = useState(null);
   const [queueSongs, setQueueSongs] = useState([]);
@@ -76,20 +37,6 @@ function PlayerProvider({ children }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState("");
-  const [queueNotice, setQueueNotice] = useState("");
-
-  const showQueueNotice = useCallback((message) => {
-  if (queueNoticeTimerRef.current) {
-    window.clearTimeout(queueNoticeTimerRef.current);
-  }
-
-  setQueueNotice(message);
-
-  queueNoticeTimerRef.current = window.setTimeout(() => {
-    setQueueNotice("");
-    queueNoticeTimerRef.current = null;
-  }, 2200);
-  }, []);
 
   const pauseAudioElement = useCallback(() => {
     const audio = audioRef.current;
@@ -148,13 +95,14 @@ function PlayerProvider({ children }) {
         setIsPlaying(false);
         setIsLoading(false);
         setError("Audio lagu belum tersedia atau audioUrl masih kosong.");
+        toast.error("Audio lagu belum tersedia atau audioUrl masih kosong.");
         return;
       }
 
       recordPlaySafely(song);
       setIsPlaying(true);
     },
-    [recordPlaySafely],
+    [recordPlaySafely, toast],
   );
 
   const playSong = useCallback(
@@ -210,12 +158,13 @@ function PlayerProvider({ children }) {
       setIsPlaying(false);
       setIsLoading(false);
       setError("Audio lagu belum tersedia atau audioUrl masih kosong.");
+      toast.error("Audio lagu belum tersedia atau audioUrl masih kosong.");
       return;
     }
 
     setError("");
     setIsPlaying((currentValue) => !currentValue);
-  }, [currentSong]);
+  }, [currentSong, toast]);
 
   const playNext = useCallback(() => {
     if (!queueSongs.length) {
@@ -286,7 +235,7 @@ function PlayerProvider({ children }) {
       const songId = getSongId(song);
 
       if (!songId) {
-        showQueueNotice("Song tidak valid dan gagal dimasukkan ke queue.");
+        toast.error("Song tidak valid dan gagal dimasukkan ke queue.");
         return false;
       }
 
@@ -295,7 +244,7 @@ function PlayerProvider({ children }) {
       });
 
       if (alreadyExists) {
-        showQueueNotice(`${song.title} sudah ada di queue.`);
+        toast.info(`${song.title} sudah ada di queue.`);
         return false;
       }
 
@@ -311,10 +260,10 @@ function PlayerProvider({ children }) {
         return [...currentQueue, song];
       });
 
-      showQueueNotice(`${song.title} berhasil dimasukkan ke queue.`);
+      toast.success(`${song.title} berhasil dimasukkan ke queue.`);
       return true;
     },
-    [queueSongs, showQueueNotice],
+    [queueSongs, toast],
   );
 
   const removeFromQueue = useCallback(
@@ -333,11 +282,14 @@ function PlayerProvider({ children }) {
         return;
       }
 
+      const removedSong = queueSongs[removedIndex];
+
       const nextQueue = queueSongs.filter((song) => {
         return getSongId(song) !== targetSongId;
       });
 
       setQueueSongs(nextQueue);
+      toast.success(`${removedSong?.title || "Song"} dihapus dari queue.`);
 
       if (getSongId(currentSong) === targetSongId) {
         const nextSong = nextQueue[removedIndex] || nextQueue[removedIndex - 1];
@@ -366,13 +318,29 @@ function PlayerProvider({ children }) {
         setCurrentIndex((index) => Math.max(index - 1, 0));
       }
     },
-    [currentIndex, currentSong, queueSongs, resetAudioElement, startSong],
+    [
+      currentIndex,
+      currentSong,
+      queueSongs,
+      resetAudioElement,
+      startSong,
+      toast,
+    ],
   );
 
   const clearQueue = useCallback(() => {
+    const hasOnlyCurrentSong = currentSong && queueSongs.length <= 1;
+
     setQueueSongs(currentSong ? [currentSong] : []);
     setCurrentIndex(currentSong ? 0 : -1);
-  }, [currentSong]);
+
+    if (hasOnlyCurrentSong) {
+      toast.info("Up next sudah kosong.");
+      return;
+    }
+
+    toast.success("Queue berhasil dibersihkan.");
+  }, [currentSong, queueSongs.length, toast]);
 
   const toggleShuffle = useCallback(() => {
     setIsShuffle((currentValue) => !currentValue);
@@ -451,12 +419,14 @@ function PlayerProvider({ children }) {
       return;
     }
 
+    const errorMessage =
+      "Audio gagal diputar. Periksa audioUrl, akses file, format audio, atau CORS dari domain audio.";
+
     setIsPlaying(false);
     setIsLoading(false);
-    setError(
-      "Audio gagal diputar. Periksa audioUrl, akses file, format audio, atau CORS dari domain audio.",
-    );
-  }, [currentSong]);
+    setError(errorMessage);
+    toast.error(errorMessage);
+  }, [currentSong, toast]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -530,83 +500,68 @@ function PlayerProvider({ children }) {
     return currentIndex >= 0 ? queueSongs.slice(currentIndex + 1) : [];
   }, [currentIndex, queueSongs]);
 
-    useEffect(() => {
-      return () => {
-        if (queueNoticeTimerRef.current) {
-          window.clearTimeout(queueNoticeTimerRef.current);
-        }
-      };
-    }, []);
-
-
-const value = useMemo(
-  () => ({
-    currentSong,
-    queueSongs,
-    currentIndex,
-    previousSong,
-    nextSong,
-    upNextSongs,
-    isShuffle,
-    isRepeat,
-    isPlaying,
-    isLoading,
-    currentTime,
-    duration,
-    error,
-    playSong,
-    playSongList,
-    pauseSong,
-    togglePlay,
-    playNext,
-    playPrevious,
-    addToQueue,
-    removeFromQueue,
-    clearQueue,
-    toggleShuffle,
-    toggleRepeat,
-    seekTo,
-    clearPlayer,
-  }),
-  [
-    addToQueue,
-    clearPlayer,
-    clearQueue,
-    currentIndex,
-    currentSong,
-    currentTime,
-    duration,
-    error,
-    isLoading,
-    isPlaying,
-    isRepeat,
-    isShuffle,
-    nextSong,
-    pauseSong,
-    playNext,
-    playPrevious,
-    playSong,
-    playSongList,
-    previousSong,
-    queueSongs,
-    removeFromQueue,
-    seekTo,
-    togglePlay,
-    toggleRepeat,
-    toggleShuffle,
-    upNextSongs,
-  ],
-);
+  const value = useMemo(
+    () => ({
+      currentSong,
+      queueSongs,
+      currentIndex,
+      previousSong,
+      nextSong,
+      upNextSongs,
+      isShuffle,
+      isRepeat,
+      isPlaying,
+      isLoading,
+      currentTime,
+      duration,
+      error,
+      playSong,
+      playSongList,
+      pauseSong,
+      togglePlay,
+      playNext,
+      playPrevious,
+      addToQueue,
+      removeFromQueue,
+      clearQueue,
+      toggleShuffle,
+      toggleRepeat,
+      seekTo,
+      clearPlayer,
+    }),
+    [
+      addToQueue,
+      clearPlayer,
+      clearQueue,
+      currentIndex,
+      currentSong,
+      currentTime,
+      duration,
+      error,
+      isLoading,
+      isPlaying,
+      isRepeat,
+      isShuffle,
+      nextSong,
+      pauseSong,
+      playNext,
+      playPrevious,
+      playSong,
+      playSongList,
+      previousSong,
+      queueSongs,
+      removeFromQueue,
+      seekTo,
+      togglePlay,
+      toggleRepeat,
+      toggleShuffle,
+      upNextSongs,
+    ],
+  );
 
   return (
     <PlayerContext.Provider value={value}>
       {children}
-
-      {queueNotice ? (
-        <div className="sf-queue-toast" role="status" aria-live="polite">
-          {queueNotice}
-        </div>
-      ) : null}
 
       <audio
         ref={audioRef}

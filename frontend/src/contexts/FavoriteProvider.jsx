@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import FavoriteContext from "./FavoriteContext";
 import useAuth from "../hooks/useAuth";
+import useToast from "../hooks/useToast";
 import {
   addFavoriteSong,
   getFavoriteSongs,
@@ -16,6 +17,7 @@ const buildFavoriteIds = (songs) => {
 
 function FavoriteProvider({ children }) {
   const { token, isAuthenticated } = useAuth();
+  const toast = useToast();
   const [favoriteSongs, setFavoriteSongs] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState(() => new Set());
   const [pendingIds, setPendingIds] = useState(() => new Set());
@@ -60,10 +62,11 @@ function FavoriteProvider({ children }) {
       setFavoriteIds(buildFavoriteIds(songs));
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Gagal memuat Favorite.");
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, toast, token]);
 
   useEffect(() => {
     let ignore = false;
@@ -103,6 +106,7 @@ function FavoriteProvider({ children }) {
       .catch((err) => {
         if (!ignore) {
           setError(err.message);
+          toast.error(err.message || "Gagal memuat Favorite.");
         }
       })
       .finally(() => {
@@ -114,7 +118,7 @@ function FavoriteProvider({ children }) {
     return () => {
       ignore = true;
     };
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, toast, token]);
 
   const isSongFavorite = useCallback(
     (songId) => {
@@ -135,6 +139,7 @@ function FavoriteProvider({ children }) {
       const songId = getSafeSongId(song?.id);
 
       if (!songId || !token) {
+        toast.error("Song tidak valid dan gagal ditambahkan ke Favorite.");
         return null;
       }
 
@@ -167,6 +172,7 @@ function FavoriteProvider({ children }) {
           return [nextSong, ...currentSongs];
         });
 
+        toast.success(`${nextSong.title || "Song"} ditambahkan ke Favorite.`);
         return nextSong;
       } catch (err) {
         setFavoriteIds((currentIds) => {
@@ -174,13 +180,15 @@ function FavoriteProvider({ children }) {
           nextIds.delete(songId);
           return nextIds;
         });
+
         setError(err.message);
+        toast.error(err.message || "Gagal menambahkan song ke Favorite.");
         throw err;
       } finally {
         stopPending(songId);
       }
     },
-    [favoriteIds, pendingIds, startPending, stopPending, token],
+    [favoriteIds, pendingIds, startPending, stopPending, toast, token],
   );
 
   const removeFavorite = useCallback(
@@ -211,17 +219,19 @@ function FavoriteProvider({ children }) {
 
       try {
         await removeFavoriteSong(token, safeSongId);
+        toast.success("Song dihapus dari Favorite.");
         return true;
       } catch (err) {
         setFavoriteSongs(previousSongs);
         setFavoriteIds(previousIds);
         setError(err.message);
+        toast.error(err.message || "Gagal menghapus song dari Favorite.");
         throw err;
       } finally {
         stopPending(safeSongId);
       }
     },
-    [favoriteIds, favoriteSongs, pendingIds, startPending, stopPending, token],
+    [favoriteIds, favoriteSongs, pendingIds, startPending, stopPending, toast, token],
   );
 
   const toggleFavorite = useCallback(
@@ -229,6 +239,7 @@ function FavoriteProvider({ children }) {
       const songId = getSafeSongId(song?.id);
 
       if (!songId) {
+        toast.error("Song tidak valid dan gagal memperbarui Favorite.");
         return null;
       }
 
@@ -238,7 +249,7 @@ function FavoriteProvider({ children }) {
 
       return addFavorite(song);
     },
-    [addFavorite, favoriteIds, removeFavorite],
+    [addFavorite, favoriteIds, removeFavorite, toast],
   );
 
   const value = useMemo(
