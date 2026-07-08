@@ -897,4 +897,130 @@ a {
   .sf-player-close {
     justify-self: stretch;
   }
+
+  .sf-music-card-link {
+  display: block;
+}
+
+.sf-music-card-link article {
+  min-width: 0;
+}
+
+.sf-fit-button {
+  width: fit-content;
+}
+
+.sf-detail-hero {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 36px);
+  align-items: end;
+  padding: clamp(20px, 4vw, 42px);
+}
+
+.sf-detail-cover {
+  display: grid;
+  aspect-ratio: 1;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid var(--sf-border);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(30, 215, 96, 0.22), transparent 60%),
+    #0c1110;
+  color: var(--sf-accent);
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 900;
+}
+
+.sf-detail-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sf-detail-artist-cover {
+  border-radius: 999px;
+}
+
+.sf-detail-copy {
+  min-width: 0;
+}
+
+.sf-detail-title {
+  margin: 0;
+  font-size: clamp(2.2rem, 7vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.08em;
+}
+
+.sf-detail-description {
+  max-width: 760px;
+  margin: 16px 0 0;
+  color: var(--sf-muted-strong);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.sf-detail-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  color: var(--sf-muted-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.sf-detail-meta-row span,
+.sf-detail-link {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--sf-border);
+  border-radius: 999px;
+  background: rgba(18, 23, 22, 0.72);
+}
+
+.sf-detail-link {
+  color: var(--sf-accent);
+}
+
+.sf-detail-link:hover {
+  border-color: rgba(30, 215, 96, 0.55);
+}
+
+.sf-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.sf-chip {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid rgba(30, 215, 96, 0.26);
+  border-radius: 999px;
+  background: var(--sf-accent-soft);
+  color: var(--sf-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .sf-detail-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .sf-detail-cover {
+    width: min(240px, 100%);
+  }
+}
+
 }

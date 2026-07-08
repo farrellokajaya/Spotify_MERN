@@ -26,15 +26,37 @@ const pageMeta = {
   },
 };
 
+const getPageMeta = (pathname) => {
+  if (pathname.startsWith("/artists/")) {
+    return {
+      eyebrow: "Artist Detail",
+      title: "Explore artist",
+      subtitle: "Lihat album dan lagu published dari artist pilihan.",
+    };
+  }
+
+  if (pathname.startsWith("/albums/")) {
+    return {
+      eyebrow: "Album Detail",
+      title: "Explore album",
+      subtitle: "Lihat daftar lagu published dari album pilihan.",
+    };
+  }
+
+  return (
+    pageMeta[pathname] || {
+      eyebrow: "Soundify",
+      title: "Soundify",
+      subtitle: "Build your music platform step by step.",
+    }
+  );
+};
+
 function MainLayout() {
   const location = useLocation();
   const { user } = useAuth();
 
-  const meta = pageMeta[location.pathname] || {
-    eyebrow: "Soundify",
-    title: "Soundify",
-    subtitle: "Build your music platform step by step.",
-  };
+  const meta = getPageMeta(location.pathname);
 
   return (
     <div className="sf-app-shell">

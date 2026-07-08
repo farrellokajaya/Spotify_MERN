@@ -54,6 +54,12 @@ export const getCurrentUser = (token) => {
   });
 };
 
+export const getAdminDashboard = (token) => {
+  return apiRequest("/api/admin/dashboard", {
+    headers: createAuthHeaders(token),
+  });
+};
+
 export const getAdminArtists = (token) => {
   return apiRequest("/api/admin/artists", {
     headers: createAuthHeaders(token),
@@ -167,4 +173,12 @@ export const searchMusic = (query) => {
   const searchParams = new URLSearchParams({ query });
 
   return apiRequest(`/api/music/search?${searchParams.toString()}`);
+};
+
+export const getPublicArtistDetail = (identifier) => {
+  return apiRequest(`/api/music/artists/${identifier}`);
+};
+
+export const getPublicAlbumDetail = (identifier) => {
+  return apiRequest(`/api/music/albums/${identifier}`);
 };

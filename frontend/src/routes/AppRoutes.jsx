@@ -7,6 +7,8 @@ import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AdminLayout from "../components/layout/AdminLayout";
 import MainLayout from "../components/layout/MainLayout";
 
+import AlbumDetailPage from "../pages/AlbumDetailPage";
+import ArtistDetailPage from "../pages/ArtistDetailPage";
 import HomePage from "../pages/HomePage";
 import LibraryPage from "../pages/LibraryPage";
 import LoginPage from "../pages/LoginPage";
@@ -31,6 +33,8 @@ function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/artists/:id" element={<ArtistDetailPage />} />
+          <Route path="/albums/:id" element={<AlbumDetailPage />} />
           <Route path="/library" element={<LibraryPage />} />
         </Route>
       </Route>
