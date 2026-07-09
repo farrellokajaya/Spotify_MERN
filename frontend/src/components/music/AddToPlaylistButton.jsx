@@ -1,4 +1,4 @@
-import { ListPlus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router";
@@ -191,8 +191,9 @@ function AddToPlaylistButton({ song }) {
         className="sf-add-playlist-button"
         onClick={handleOpen}
         aria-label={`Add ${song.title} to playlist`}
+        title="Add to playlist"
       >
-        <ListPlus size={16} aria-hidden="true" />
+        <Plus size={17} aria-hidden="true" />
       </button>
 
       {modal ? createPortal(modal, document.body) : null}
