@@ -243,13 +243,18 @@ function FavoriteProvider({ children }) {
         return null;
       }
 
+      if (!isAuthenticated || !token) {
+        toast.info("Login untuk menyimpan lagu ke Library.");
+        return null;
+      }
+
       if (favoriteIds.has(songId)) {
         return removeFavorite(songId);
       }
 
       return addFavorite(song);
     },
-    [addFavorite, favoriteIds, removeFavorite, toast],
+    [addFavorite, favoriteIds, isAuthenticated, removeFavorite, toast, token],
   );
 
   const value = useMemo(

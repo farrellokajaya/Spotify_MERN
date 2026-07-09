@@ -2062,3 +2062,37 @@ img {
 
 
 
+
+.sf-topbar-auth-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sf-guest-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--sf-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--sf-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 680px) {
+  .sf-topbar-auth-actions {
+    align-items: flex-end;
+    flex-direction: column;
+  }
+
+  .sf-guest-pill {
+    display: none;
+  }
+}

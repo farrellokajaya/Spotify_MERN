@@ -50,7 +50,7 @@ function LoginPage() {
   return (
     <main className="auth-page">
       <section className="auth-card">
-        <Link className="brand" to="/login">
+        <Link className="brand" to="/">
           Soundify
         </Link>
 
@@ -123,6 +123,11 @@ function LoginPage() {
         <p className="auth-footer">
           Belum memiliki akun?{" "}
           <Link to="/register">Daftar</Link>
+        </p>
+
+        <p className="auth-footer">
+          Ingin lihat demo dulu?{" "}
+          <Link to="/">Lanjut sebagai guest</Link>
         </p>
       </section>
     </main>

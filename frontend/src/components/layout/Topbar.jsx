@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import useAuth from "../../hooks/useAuth";
 
@@ -33,7 +33,7 @@ function Topbar({
   function handleLogout() {
     logout();
     setIsOpen(false);
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   }
 
   return (
@@ -48,47 +48,61 @@ function Topbar({
       </div>
 
       <div className="sf-user-menu">
-        <button
-          type="button"
-          className="sf-user-button"
-          aria-haspopup="menu"
-          aria-expanded={isOpen}
-          onClick={() => setIsOpen((current) => !current)}
-        >
-          <span className="sf-user-avatar">{initials}</span>
-
-          <span className="sf-user-meta">
-            <span className="sf-user-name">
-              {user?.name || "User"}
-            </span>
-
-            <span className="sf-user-role">
-              {user?.role || "user"}
-            </span>
-          </span>
-        </button>
-
-        {isOpen ? (
-          <div className="sf-user-dropdown" role="menu">
-            <div className="sf-user-dropdown-header">
-              <p className="sf-user-dropdown-name">
-                {user?.name || "User"}
-              </p>
-
-              <p className="sf-user-dropdown-email">
-                {user?.email || "No email"}
-              </p>
-            </div>
-
+        {!user ? (
+          <div className="sf-topbar-auth-actions" aria-label="Guest actions">
+            <span className="sf-guest-pill">Guest mode</span>
+            <Link to="/login" className="sf-button sf-button-secondary">
+              Login
+            </Link>
+            <Link to="/register" className="sf-button sf-button-primary">
+              Register
+            </Link>
+          </div>
+        ) : (
+          <>
             <button
               type="button"
-              className="sf-dropdown-action"
-              onClick={handleLogout}
+              className="sf-user-button"
+              aria-haspopup="menu"
+              aria-expanded={isOpen}
+              onClick={() => setIsOpen((current) => !current)}
             >
-              Logout
+              <span className="sf-user-avatar">{initials}</span>
+
+              <span className="sf-user-meta">
+                <span className="sf-user-name">
+                  {user.name || "User"}
+                </span>
+
+                <span className="sf-user-role">
+                  {user.role || "user"}
+                </span>
+              </span>
             </button>
-          </div>
-        ) : null}
+
+            {isOpen ? (
+              <div className="sf-user-dropdown" role="menu">
+                <div className="sf-user-dropdown-header">
+                  <p className="sf-user-dropdown-name">
+                    {user.name || "User"}
+                  </p>
+
+                  <p className="sf-user-dropdown-email">
+                    {user.email || "No email"}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="sf-dropdown-action"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : null}
+          </>
+        )}
       </div>
     </header>
   );

@@ -17,7 +17,7 @@ const initialMusicData = {
 };
 
 function HomePage() {
-  const { user } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [musicData, setMusicData] = useState(initialMusicData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -74,14 +74,21 @@ function HomePage() {
         <h2 className="sf-hero-title">Music browsing starts here.</h2>
 
         <p className="sf-hero-description">
-          Halo, {user?.name || "User"}. Dengarkan katalog musik yang sudah
-          dipublikasikan dari admin Soundify.
+          Halo, {user?.name || "Guest"}. Kamu bisa langsung browse, search,
+          memutar lagu, dan mencoba queue tanpa login. Login diperlukan untuk
+          menyimpan favorite, membuat playlist, dan melihat recently played.
         </p>
 
         <div className="sf-button-row">
           <Link to="/search" className="sf-button sf-button-primary">
             Search Music
           </Link>
+
+          {isAuthenticated ? null : (
+            <Link to="/login" className="sf-button sf-button-secondary">
+              Login for Library
+            </Link>
+          )}
 
           {user?.role === "admin" ? (
             <Link to="/admin" className="sf-button sf-button-secondary">

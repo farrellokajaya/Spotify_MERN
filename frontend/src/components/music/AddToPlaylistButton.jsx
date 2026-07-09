@@ -80,6 +80,12 @@ function AddToPlaylistButton({ song }) {
 
   const handleOpen = (event) => {
     event.stopPropagation();
+
+    if (!token) {
+      toast.info("Login untuk menambahkan lagu ke playlist.");
+      return;
+    }
+
     setOpen(true);
     setError("");
   };

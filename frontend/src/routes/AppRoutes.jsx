@@ -34,17 +34,18 @@ function AppRoutes() {
         <Route path="/register" element={<RegisterPage />} />
       </Route>
 
-      <Route element={<ProtectedRoute />}>
-        <Route element={<MainLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/artists/:id" element={<ArtistDetailPage />} />
-          <Route path="/albums/:id" element={<AlbumDetailPage />} />
-          <Route path="/library" element={<LibraryPage />} />
-          <Route path="/playlists" element={<PlaylistPage />} />
-          <Route path="/playlists/:id" element={<PlaylistDetailPage />} />
-          <Route path="/recently-played" element={<RecentlyPlayedPage />} />
-          <Route path="/queue" element={<QueuePage />} />
+      <Route element={<MainLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="search" element={<SearchPage />} />
+        <Route path="artists/:id" element={<ArtistDetailPage />} />
+        <Route path="albums/:id" element={<AlbumDetailPage />} />
+        <Route path="queue" element={<QueuePage />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="library" element={<LibraryPage />} />
+          <Route path="playlists" element={<PlaylistPage />} />
+          <Route path="playlists/:id" element={<PlaylistDetailPage />} />
+          <Route path="recently-played" element={<RecentlyPlayedPage />} />
         </Route>
       </Route>
 

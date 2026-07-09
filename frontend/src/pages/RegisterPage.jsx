@@ -71,7 +71,7 @@ function RegisterPage() {
   return (
     <main className="auth-page">
       <section className="auth-card">
-        <Link className="brand" to="/login">
+        <Link className="brand" to="/">
           Soundify
         </Link>
 
@@ -80,8 +80,8 @@ function RegisterPage() {
           <h1>Mulai gunakan Soundify</h1>
 
           <p>
-            Daftar untuk menyimpan sesi dan mengakses
-            homepage.
+            Daftar untuk menyimpan favorite, membuat playlist, dan melihat
+            listening history.
           </p>
         </div>
 
@@ -169,6 +169,11 @@ function RegisterPage() {
         <p className="auth-footer">
           Sudah memiliki akun?{" "}
           <Link to="/login">Masuk</Link>
+        </p>
+
+        <p className="auth-footer">
+          Ingin lihat demo dulu?{" "}
+          <Link to="/">Lanjut sebagai guest</Link>
         </p>
       </section>
     </main>
