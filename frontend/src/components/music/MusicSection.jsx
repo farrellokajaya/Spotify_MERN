@@ -1,3 +1,5 @@
+import EmptyState from "../common/EmptyState";
+
 function MusicSection({ title, subtitle, isEmpty, emptyMessage, children }) {
   return (
     <section className="sf-music-section">
@@ -9,7 +11,7 @@ function MusicSection({ title, subtitle, isEmpty, emptyMessage, children }) {
       </div>
 
       {isEmpty ? (
-        <div className="sf-empty-panel">{emptyMessage}</div>
+        <EmptyState message={emptyMessage} />
       ) : (
         <div className="sf-music-grid">{children}</div>
       )}

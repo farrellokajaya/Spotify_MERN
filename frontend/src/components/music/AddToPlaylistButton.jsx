@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router";
 
+import EmptyState from "../common/EmptyState";
+import ErrorState from "../common/ErrorState";
+import IconButton from "../common/IconButton";
+import LoadingState from "../common/LoadingState";
 import useAuth from "../../hooks/useAuth";
 import useToast from "../../hooks/useToast";
 import { addSongToPlaylist, getUserPlaylists } from "../../services/api";
@@ -131,34 +135,21 @@ function AddToPlaylistButton({ song }) {
             <p>{song.title}</p>
           </div>
 
-          <button
-            type="button"
-            className="sf-icon-button"
-            onClick={handleClose}
-            aria-label="Close playlist modal"
-          >
-            <X size={18} aria-hidden="true" />
-          </button>
+          <IconButton icon={X} label="Close playlist modal" onClick={handleClose} />
         </div>
 
-        {error ? (
-          <div className="sf-alert sf-alert-error" role="alert">
-            {error}
-          </div>
-        ) : null}
+        <ErrorState message={error} />
 
-        {loading ? (
-          <div className="sf-empty-panel">Memuat playlist...</div>
-        ) : null}
+        {loading ? <LoadingState message="Memuat playlist..." /> : null}
 
         {!loading && playlists.length === 0 ? (
-          <div className="sf-empty-panel">
+          <EmptyState>
             Belum ada playlist. Buat playlist dulu dari halaman{" "}
             <Link to="/playlists" onClick={() => setOpen(false)}>
               Playlists
             </Link>
             .
-          </div>
+          </EmptyState>
         ) : null}
 
         {!loading && playlists.length > 0 ? (

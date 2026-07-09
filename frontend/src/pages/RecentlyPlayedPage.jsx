@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
+import ErrorState from "../components/common/ErrorState";
+import LoadingState from "../components/common/LoadingState";
 import MusicSection from "../components/music/MusicSection";
 import SongCard from "../components/music/SongCard";
 import useAuth from "../hooks/useAuth";
@@ -81,6 +83,8 @@ function RecentlyPlayedPage() {
     }
   };
 
+  const historySongs = history.map((historyItem) => historyItem.song);
+
   return (
     <section className="sf-browse-page">
       <div className="sf-content-card sf-page-panel">
@@ -113,15 +117,9 @@ function RecentlyPlayedPage() {
         </div>
       </div>
 
-      {error ? (
-        <div className="sf-alert sf-alert-error" role="alert">
-          {error}
-        </div>
-      ) : null}
+      <ErrorState message={error} />
 
-      {loading ? (
-        <div className="sf-empty-panel">Memuat recently played...</div>
-      ) : null}
+      {loading ? <LoadingState message="Memuat recently played..." /> : null}
 
       {!loading && !error ? (
         <MusicSection
@@ -134,7 +132,7 @@ function RecentlyPlayedPage() {
             <SongCard
               key={item.id}
               song={item.song}
-              songs={history.map((historyItem) => historyItem.song)}
+              songs={historySongs}
               metaText={formatPlayedAt(item.playedAt)}
             />
           ))}

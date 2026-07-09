@@ -99,10 +99,9 @@ function PlayerProvider({ children }) {
         return;
       }
 
-      recordPlaySafely(song);
       setIsPlaying(true);
     },
-    [recordPlaySafely, toast],
+    [toast],
   );
 
   const playSong = useCallback(
@@ -351,6 +350,7 @@ function PlayerProvider({ children }) {
   }, []);
 
   const clearPlayer = useCallback(() => {
+    lastRecordedSongIdRef.current = "";
     resetAudioElement();
     setCurrentSong(null);
     setQueueSongs([]);
@@ -471,10 +471,16 @@ function PlayerProvider({ children }) {
     }
 
     const songId = getSongId(currentSong);
+    const recordCurrentSongPlay = () => {
+      if (audio.dataset.songId === songId) {
+        recordPlaySafely(currentSong);
+      }
+    };
+
     const playPromise = audio.play();
 
     if (playPromise) {
-      playPromise.catch(() => {
+      playPromise.then(recordCurrentSongPlay).catch(() => {
         if (audio.dataset.songId !== songId) {
           return;
         }
@@ -485,8 +491,11 @@ function PlayerProvider({ children }) {
           "Audio gagal diputar. Browser mungkin memblokir autoplay, audioUrl tidak valid, atau file audio tidak bisa diakses.",
         );
       });
+      return;
     }
-  }, [currentSong, isPlaying]);
+
+    recordCurrentSongPlay();
+  }, [currentSong, isPlaying, recordPlaySafely]);
 
   const previousSong = useMemo(() => {
     return currentIndex > 0 ? queueSongs[currentIndex - 1] : null;

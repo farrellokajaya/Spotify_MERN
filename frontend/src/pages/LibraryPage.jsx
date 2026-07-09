@@ -1,3 +1,5 @@
+import ErrorState from "../components/common/ErrorState";
+import LoadingState from "../components/common/LoadingState";
 import MusicSection from "../components/music/MusicSection";
 import SongCard from "../components/music/SongCard";
 import useFavorites from "../hooks/useFavorites";
@@ -28,15 +30,9 @@ export default function LibraryPage() {
         </div>
       </div>
 
-      {error ? (
-        <div className="sf-alert sf-alert-error" role="alert">
-          {error}
-        </div>
-      ) : null}
+      <ErrorState message={error} />
 
-      {loading ? (
-        <div className="sf-empty-panel">Memuat favorite songs...</div>
-      ) : null}
+      {loading ? <LoadingState message="Memuat favorite songs..." /> : null}
 
       {!loading && !error ? (
         <MusicSection

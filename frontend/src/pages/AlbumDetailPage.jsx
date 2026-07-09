@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
+import EmptyState from "../components/common/EmptyState";
+import ErrorState from "../components/common/ErrorState";
+import LoadingState from "../components/common/LoadingState";
 import MusicSection from "../components/music/MusicSection";
 import SongCard from "../components/music/SongCard";
 import { getPublicAlbumDetail } from "../services/api";
@@ -35,7 +38,7 @@ function AlbumDetailPage() {
         const response = await getPublicAlbumDetail(id);
 
         if (!ignore) {
-          setDetail(response.data);
+          setDetail(response.data || initialAlbumDetail);
         }
       } catch (err) {
         if (!ignore) {
@@ -57,15 +60,13 @@ function AlbumDetailPage() {
   }, [id]);
 
   if (loading) {
-    return <div className="sf-empty-panel">Memuat detail album...</div>;
+    return <LoadingState message="Memuat detail album..." />;
   }
 
   if (error) {
     return (
       <section className="sf-browse-page">
-        <div className="sf-alert sf-alert-error" role="alert">
-          {error}
-        </div>
+        <ErrorState message={error} />
 
         <Link to="/" className="sf-button sf-button-secondary sf-fit-button">
           Kembali ke Home
@@ -77,7 +78,7 @@ function AlbumDetailPage() {
   if (!detail.album) {
     return (
       <section className="sf-browse-page">
-        <div className="sf-empty-panel">Data album tidak ditemukan.</div>
+        <EmptyState message="Data album tidak ditemukan." />
 
         <Link to="/" className="sf-button sf-button-secondary sf-fit-button">
           Kembali ke Home

@@ -2,6 +2,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
 
+import EmptyState from "../components/common/EmptyState";
+import ErrorState from "../components/common/ErrorState";
+import LoadingState from "../components/common/LoadingState";
 import useAuth from "../hooks/useAuth";
 import useToast from "../hooks/useToast";
 import {
@@ -25,10 +28,11 @@ function PlaylistPage() {
   const [error, setError] = useState("");
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState("");
-  const [editName, setEditName] = useState("");
+  const [editForm, setEditForm] = useState(initialForm);
 
   const loadPlaylists = useCallback(async () => {
     if (!token) {
+      setLoading(false);
       return;
     }
 
@@ -99,12 +103,25 @@ function PlaylistPage() {
 
   const startEdit = (playlist) => {
     setEditingId(playlist.id);
-    setEditName(playlist.name);
+    setEditForm({
+      name: playlist.name || "",
+      description: playlist.description || "",
+    });
+    setError("");
   };
 
   const cancelEdit = () => {
     setEditingId("");
-    setEditName("");
+    setEditForm(initialForm);
+  };
+
+  const handleEditChange = (event) => {
+    const { name, value } = event.target;
+
+    setEditForm((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
   };
 
   const handleUpdate = async (playlistId) => {
@@ -113,7 +130,8 @@ function PlaylistPage() {
       setError("");
 
       const response = await updatePlaylist(token, playlistId, {
-        name: editName,
+        name: editForm.name,
+        description: editForm.description,
       });
 
       setPlaylists((currentPlaylists) =>
@@ -135,6 +153,8 @@ function PlaylistPage() {
       setSubmitting(false);
     }
   };
+
+  const isEditInvalid = editForm.name.trim().length < 2;
 
   const handleDelete = async (playlist) => {
     const confirmed = window.confirm(
@@ -224,18 +244,12 @@ function PlaylistPage() {
         </div>
       </div>
 
-      {error ? (
-        <div className="sf-alert sf-alert-error" role="alert">
-          {error}
-        </div>
-      ) : null}
+      <ErrorState message={error} />
 
-      {loading ? <div className="sf-empty-panel">Memuat playlist...</div> : null}
+      {loading ? <LoadingState message="Memuat playlist..." /> : null}
 
       {!loading && !error && playlists.length === 0 ? (
-        <div className="sf-empty-panel">
-          Belum ada playlist. Buat playlist pertama kamu dari form di atas.
-        </div>
+        <EmptyState message="Belum ada playlist. Buat playlist pertama kamu dari form di atas." />
       ) : null}
 
       {!loading && playlists.length > 0 ? (
@@ -245,16 +259,32 @@ function PlaylistPage() {
               {editingId === playlist.id ? (
                 <div className="sf-playlist-edit-panel">
                   <div className="sf-form-field">
-                    <label htmlFor={`edit-${playlist.id}`}>
-                      Edit playlist name
+                    <label htmlFor={`edit-name-${playlist.id}`}>
+                      Playlist name
                     </label>
                     <input
-                      id={`edit-${playlist.id}`}
+                      id={`edit-name-${playlist.id}`}
+                      name="name"
                       type="text"
-                      value={editName}
-                      onChange={(event) => setEditName(event.target.value)}
+                      value={editForm.name}
+                      onChange={handleEditChange}
                       minLength="2"
                       maxLength="80"
+                    />
+                  </div>
+
+                  <div className="sf-form-field">
+                    <label htmlFor={`edit-description-${playlist.id}`}>
+                      Description
+                    </label>
+                    <textarea
+                      id={`edit-description-${playlist.id}`}
+                      name="description"
+                      value={editForm.description}
+                      onChange={handleEditChange}
+                      placeholder="Opsional"
+                      maxLength="500"
+                      rows="3"
                     />
                   </div>
 
@@ -263,9 +293,9 @@ function PlaylistPage() {
                       type="button"
                       className="sf-button sf-button-primary"
                       onClick={() => handleUpdate(playlist.id)}
-                      disabled={submitting || editName.trim().length < 2}
+                      disabled={submitting || isEditInvalid}
                     >
-                      Save
+                      {submitting ? "Saving..." : "Save"}
                     </button>
 
                     <button
@@ -301,6 +331,7 @@ function PlaylistPage() {
                       className="sf-button sf-button-secondary sf-button-with-icon"
                       onClick={() => startEdit(playlist)}
                       disabled={submitting}
+                      aria-label={`Edit playlist ${playlist.name}`}
                     >
                       <Pencil size={16} aria-hidden="true" />
                       <span>Edit</span>
@@ -311,6 +342,7 @@ function PlaylistPage() {
                       className="sf-button sf-button-danger sf-button-with-icon"
                       onClick={() => handleDelete(playlist)}
                       disabled={submitting}
+                      aria-label={`Delete playlist ${playlist.name}`}
                     >
                       <Trash2 size={16} aria-hidden="true" />
                       <span>Delete</span>

@@ -2,6 +2,9 @@ import { ListPlus, Loader2, Pause, Play, Shuffle, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 
+import EmptyState from "../components/common/EmptyState";
+import ErrorState from "../components/common/ErrorState";
+import LoadingState from "../components/common/LoadingState";
 import useAuth from "../hooks/useAuth";
 import usePlayer from "../hooks/usePlayer";
 import useToast from "../hooks/useToast";
@@ -41,6 +44,7 @@ function PlaylistDetailPage() {
 
   const loadPlaylistDetail = useCallback(async () => {
     if (!token) {
+      setLoading(false);
       return;
     }
 
@@ -175,15 +179,13 @@ function PlaylistDetailPage() {
   };
 
   if (loading) {
-    return <div className="sf-empty-panel">Memuat detail playlist...</div>;
+    return <LoadingState message="Memuat detail playlist..." />;
   }
 
   if (error && !playlist) {
     return (
       <section className="sf-browse-page">
-        <div className="sf-alert sf-alert-error" role="alert">
-          {error}
-        </div>
+        <ErrorState message={error} />
 
         <Link to="/playlists" className="sf-button sf-button-secondary sf-fit-button">
           Kembali ke Playlists
@@ -195,7 +197,7 @@ function PlaylistDetailPage() {
   if (!playlist) {
     return (
       <section className="sf-browse-page">
-        <div className="sf-empty-panel">Playlist tidak ditemukan.</div>
+        <EmptyState message="Playlist tidak ditemukan." />
 
         <Link to="/playlists" className="sf-button sf-button-secondary sf-fit-button">
           Kembali ke Playlists
@@ -231,6 +233,7 @@ function PlaylistDetailPage() {
               className="sf-button sf-button-primary sf-button-with-icon"
               onClick={handlePlayAll}
               disabled={!songs.length}
+              aria-label={`Play all songs from ${playlist.name}`}
             >
               <Play size={16} fill="currentColor" aria-hidden="true" />
               <span>Play All</span>
@@ -241,6 +244,7 @@ function PlaylistDetailPage() {
               className="sf-button sf-button-secondary sf-button-with-icon"
               onClick={handleShufflePlay}
               disabled={!songs.length}
+              aria-label={`Shuffle play ${playlist.name}`}
             >
               <Shuffle size={16} aria-hidden="true" />
               <span>Shuffle Play</span>
@@ -251,6 +255,7 @@ function PlaylistDetailPage() {
               className="sf-button sf-button-secondary sf-button-with-icon"
               onClick={handleQueueAll}
               disabled={!songs.length}
+              aria-label={`Add all songs from ${playlist.name} to queue`}
             >
               <ListPlus size={16} aria-hidden="true" />
               <span>Queue All</span>
@@ -259,17 +264,10 @@ function PlaylistDetailPage() {
         </div>
       </div>
 
-      {error ? (
-        <div className="sf-alert sf-alert-error" role="alert">
-          {error}
-        </div>
-      ) : null}
+      <ErrorState message={error} />
 
       {songs.length === 0 ? (
-        <div className="sf-empty-panel">
-          Playlist ini belum memiliki song. Tambahkan lagu dari Home, Search,
-          Artist Detail, Album Detail, atau Library dengan tombol Add to playlist.
-        </div>
+        <EmptyState message="Playlist ini belum memiliki song. Tambahkan lagu dari Home, Search, Artist Detail, Album Detail, atau Library dengan tombol Add to playlist." />
       ) : (
         <div className="sf-content-card sf-playlist-song-list">
           {songs.map((song, index) => {

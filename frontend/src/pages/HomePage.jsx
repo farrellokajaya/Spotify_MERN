@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
+import ErrorState from "../components/common/ErrorState";
+import LoadingState from "../components/common/LoadingState";
 import AlbumCard from "../components/music/AlbumCard";
 import ArtistCard from "../components/music/ArtistCard";
 import MusicSection from "../components/music/MusicSection";
@@ -27,7 +29,7 @@ function HomePage() {
 
       const response = await getMusicHome();
 
-      setMusicData(response.data);
+      setMusicData(response.data || initialMusicData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -43,7 +45,7 @@ function HomePage() {
         const response = await getMusicHome();
 
         if (!ignore) {
-          setMusicData(response.data);
+          setMusicData(response.data || initialMusicData);
           setError("");
         }
       } catch (err) {
@@ -93,18 +95,14 @@ function HomePage() {
             onClick={loadMusicHome}
             disabled={loading}
           >
-            Refresh
+            {loading ? "Refreshing..." : "Refresh"}
           </button>
         </div>
       </section>
 
-      {error ? (
-        <div className="sf-alert sf-alert-error" role="alert">
-          {error}
-        </div>
-      ) : null}
+      <ErrorState message={error} />
 
-      {loading ? <div className="sf-empty-panel">Memuat data musik...</div> : null}
+      {loading ? <LoadingState message="Memuat data musik..." /> : null}
 
       {!loading && !error ? (
         <>

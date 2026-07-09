@@ -1,5 +1,6 @@
 import { Loader2, Pause, Play, Trash2 } from "lucide-react";
 
+import EmptyState from "../components/common/EmptyState";
 import usePlayer from "../hooks/usePlayer";
 import { formatDuration } from "../utils/format";
 import { getSongImage } from "../utils/song";
@@ -124,10 +125,7 @@ function QueuePage() {
       </div>
 
       {!hasQueue ? (
-        <div className="sf-empty-panel">
-          Queue masih kosong. Tambahkan lagu dari tombol Queue di SongCard atau
-          putar lagu dari playlist.
-        </div>
+        <EmptyState message="Queue masih kosong. Tambahkan lagu dari tombol Queue di SongCard atau putar lagu dari playlist." />
       ) : null}
 
       {currentSong ? (

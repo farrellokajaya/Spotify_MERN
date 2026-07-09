@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+import EmptyState from "../components/common/EmptyState";
+import ErrorState from "../components/common/ErrorState";
+import LoadingState from "../components/common/LoadingState";
 import AlbumCard from "../components/music/AlbumCard";
 import ArtistCard from "../components/music/ArtistCard";
 import MusicSection from "../components/music/MusicSection";
@@ -30,7 +33,7 @@ function SearchPage() {
 
       const response = await searchMusic(query.trim());
 
-      setResults(response.data);
+      setResults(response.data || initialResults);
     } catch (err) {
       setError(err.message);
       setResults(initialResults);
@@ -51,8 +54,7 @@ function SearchPage() {
         <h2 className="sf-page-title">Find your music</h2>
 
         <p className="sf-page-subtitle">
-          Cari lagu, artist, atau album yang sudah tersedia di katalog
-          Soundify.
+          Cari lagu, artist, atau album yang sudah tersedia di katalog Soundify.
         </p>
 
         <form className="sf-search-form" onSubmit={handleSubmit}>
@@ -79,18 +81,12 @@ function SearchPage() {
         </form>
       </div>
 
-      {error ? (
-        <div className="sf-alert sf-alert-error" role="alert">
-          {error}
-        </div>
-      ) : null}
+      <ErrorState message={error} />
 
-      {loading ? <div className="sf-empty-panel">Mencari musik...</div> : null}
+      {loading ? <LoadingState message="Mencari musik..." /> : null}
 
       {!loading && hasSearched && !error && !hasResults ? (
-        <div className="sf-empty-panel">
-          Tidak ada hasil untuk &quot;{results.query || query}&quot;.
-        </div>
+        <EmptyState message={`Tidak ada hasil untuk "${results.query || query}".`} />
       ) : null}
 
       {!loading && hasResults ? (

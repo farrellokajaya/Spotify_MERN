@@ -25,14 +25,26 @@ function ToastProvider({ children }) {
       return;
     }
 
+    const toastType = options.type || "info";
+
     const nextToast = {
       id: createToastId(),
       message,
-      type: options.type || "info",
+      type: toastType,
       duration: options.duration || 2600,
     };
 
-    setToasts((currentToasts) => [...currentToasts.slice(-3), nextToast]);
+    setToasts((currentToasts) => {
+      const alreadyVisible = currentToasts.some((toast) => {
+        return toast.message === message && toast.type === toastType;
+      });
+
+      if (alreadyVisible) {
+        return currentToasts;
+      }
+
+      return [...currentToasts.slice(-3), nextToast];
+    });
   }, []);
 
   const toast = useMemo(
